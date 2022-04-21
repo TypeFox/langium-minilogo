@@ -6,7 +6,7 @@ MiniLogo is a example language for operating a 'pen' to draw on a surface. If yo
 
 This implementation is based on [Eric Walkingshaw's grammar and semantics at OSU](https://web.engr.oregonstate.edu/~walkiner/teaching/cs381-wi21/minilogo.html).
 
-Which in turn, is based on the [Logo](https://el.media.mit.edu/logo-foundation/what_is_logo/logo_programming.html) itself.
+Which in turn, is based on the [Logo language](https://el.media.mit.edu/logo-foundation/what_is_logo/logo_programming.html) itself.
 
 There is, at this time, a single example in **examples/test.logo**. Which demonstrates the aspects of MiniLogo:
 - **Move** commands to change position of the pen
@@ -39,4 +39,6 @@ $ ./bin/cli generate examples/test.logo
 The result is present in `examples/generated/test.html`, which you can open in your browser, and view the following.
 
 ![Image of the resulting HTML page generated test.logo](ex1.png)
+
+For convenience, the pre-generated examples are included in this repo already under [/examples/generated/](https://github.com/montymxb/minilogo-langium-example/tree/main/examples/generated).
 
