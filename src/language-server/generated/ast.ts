@@ -5,7 +5,7 @@
 
 /* eslint-disable @typescript-eslint/array-type */
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { AstNode, AstReflection, isAstNode } from 'langium';
+import { AstNode, AstReflection, Reference, isAstNode } from 'langium';
 
 export type Cmd = For | Move | Pen;
 
@@ -55,22 +55,11 @@ export function isBinOp(item: unknown): item is BinOp {
     return reflection.isInstance(item, BinOp);
 }
 
-export interface Block extends AstNode {
-    readonly $container: Def | For;
-    body: Array<Stmt>
-}
-
-export const Block = 'Block';
-
-export function isBlock(item: unknown): item is Block {
-    return reflection.isInstance(item, Block);
-}
-
 export interface Def extends AstNode {
     readonly $container: Model;
-    b: Block
+    body: Array<Stmt>
     name: string
-    params: Array<string>
+    params: Array<Param>
 }
 
 export const Def = 'Def';
@@ -80,11 +69,11 @@ export function isDef(item: unknown): item is Def {
 }
 
 export interface For extends AstNode {
-    readonly $container: Block | Model;
-    b: Block
+    readonly $container: Def | For | Model;
+    body: Array<Stmt>
     e1: Expr
     e2: Expr
-    var: string
+    var: Param
 }
 
 export const For = 'For';
@@ -116,9 +105,9 @@ export function isLit(item: unknown): item is Lit {
 }
 
 export interface Macro extends AstNode {
-    readonly $container: Block | Model;
+    readonly $container: Def | For | Model;
     args: Array<Expr>
-    name: string
+    def: Reference<Def>
 }
 
 export const Macro = 'Macro';
@@ -139,7 +128,7 @@ export function isModel(item: unknown): item is Model {
 }
 
 export interface Move extends AstNode {
-    readonly $container: Block | Model;
+    readonly $container: Def | For | Model;
     ex: Expr
     ey: Expr
 }
@@ -161,8 +150,19 @@ export function isNegExpr(item: unknown): item is NegExpr {
     return reflection.isInstance(item, NegExpr);
 }
 
+export interface Param extends AstNode {
+    readonly $container: Def | For;
+    name: string
+}
+
+export const Param = 'Param';
+
+export function isParam(item: unknown): item is Param {
+    return reflection.isInstance(item, Param);
+}
+
 export interface Pen extends AstNode {
-    readonly $container: Block | Model;
+    readonly $container: Def | For | Model;
     mode: 'down' | 'up'
 }
 
@@ -174,7 +174,7 @@ export function isPen(item: unknown): item is Pen {
 
 export interface Ref extends AstNode {
     readonly $container: BinExpr | For | Group | Macro | Move | NegExpr;
-    val: string
+    val: Reference<Param>
 }
 
 export const Ref = 'Ref';
@@ -183,14 +183,14 @@ export function isRef(item: unknown): item is Ref {
     return reflection.isInstance(item, Ref);
 }
 
-export type MiniLogoAstType = 'BinExpr' | 'BinOp' | 'Block' | 'Cmd' | 'Def' | 'Expr' | 'For' | 'Group' | 'Lit' | 'Macro' | 'Model' | 'Move' | 'NegExpr' | 'Pen' | 'Ref' | 'Stmt';
+export type MiniLogoAstType = 'BinExpr' | 'BinOp' | 'Cmd' | 'Def' | 'Expr' | 'For' | 'Group' | 'Lit' | 'Macro' | 'Model' | 'Move' | 'NegExpr' | 'Param' | 'Pen' | 'Ref' | 'Stmt';
 
-export type MiniLogoAstReference = never;
+export type MiniLogoAstReference = 'Macro:def' | 'Ref:val';
 
 export class MiniLogoAstReflection implements AstReflection {
 
     getAllTypes(): string[] {
-        return ['BinExpr', 'BinOp', 'Block', 'Cmd', 'Def', 'Expr', 'For', 'Group', 'Lit', 'Macro', 'Model', 'Move', 'NegExpr', 'Pen', 'Ref', 'Stmt'];
+        return ['BinExpr', 'BinOp', 'Cmd', 'Def', 'Expr', 'For', 'Group', 'Lit', 'Macro', 'Model', 'Move', 'NegExpr', 'Param', 'Pen', 'Ref', 'Stmt'];
     }
 
     isInstance(node: unknown, type: string): boolean {
@@ -226,6 +226,12 @@ export class MiniLogoAstReflection implements AstReflection {
 
     getReferenceType(referenceId: MiniLogoAstReference): string {
         switch (referenceId) {
+            case 'Macro:def': {
+                return Def;
+            }
+            case 'Ref:val': {
+                return Param;
+            }
             default: {
                 throw new Error(`${referenceId} is not a valid reference id.`);
             }

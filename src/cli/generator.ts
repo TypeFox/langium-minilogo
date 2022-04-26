@@ -1,10 +1,20 @@
 import fs from 'fs';
 import { CompositeGeneratorNode, NL, processGeneratorNode } from 'langium';
 import path from 'path';
-import { isPen, isMove, isLit, isMacro, isGroup, Stmt, Def, Model, Expr, isRef, isBinExpr, isFor, isNegExpr } from '../language-server/generated/ast';
+import { isPen, isMove, isLit, isMacro, isGroup, Stmt, Model, Expr, isRef, isBinExpr, isFor, isNegExpr } from '../language-server/generated/ast';
 import { extractDestinationAndName } from './cli-util';
 
+// Map binds final values to names for references to function
 type MiniLogoGenEnv = Map<string,number>;
+
+// Represents the current drawing state
+type DrawingState = {
+    // point
+    px:     number,
+    py:     number,
+    // whether then pen is touching the canvas or not
+    drawing: boolean
+};
 
 export function generateJavaScript(model: Model, filePath: string, destination: string | undefined): string {
     const data = extractDestinationAndName(filePath, destination);
@@ -46,101 +56,30 @@ export function generateJavaScript(model: Model, filePath: string, destination: 
         "\tcontext.beginPath();\n",
         NL);
 
-    let drawing = false;
-    let px = 0;
-    let py = 0;
+    // setup drawing state
+    let state : DrawingState = {
+        px: 0,
+        py: 0,
+        drawing: false
+    };
+
     // minilogo evaluation env
-    let miniEnv : MiniLogoGenEnv = new Map<string,number>();
+    let env : MiniLogoGenEnv = new Map<string,number>();
 
-    // map of funcs w/ their names
-    // TODO this should be computed with cross refs instead !
-    let defs = new Map<string, Def>();
-    model.defs.map((d) => defs.set(d.name, d));
+    // write the mini logo function using the commands we produced, and write them out
+    let computedJS = model.stmts.flatMap(s => evalStmt(s,env,state));
+    if(computedJS != undefined) {
+        // good to go
+        computedJS.forEach(line => fileNodeJS.append(line + ";\n"));
 
-    // effectful & recursive statement evaluation
-    function evalStmt(stmt: Stmt) : void {
-        if(isPen(stmt)) {
-            // pen change
-            if(stmt.mode == 'up') {
-                // lift pen up & complete existing path
-                drawing = false;
-                fileNodeJS.append("\tcontext.stroke();\n");
+    } else {
+        // failed to compile to JS
+        throw new Error("Failed to compile MiniLogo program to JS draw instructions!"); 
 
-            } else {
-                // push pen down & start new path
-                drawing = true;
-                fileNodeJS.append("\tcontext.beginPath();\n");
-
-            }
-
-        } else if(isMove(stmt)) {
-            // update pen position
-            px += evalExprWithEnv(stmt.ex, miniEnv);
-            py += evalExprWithEnv(stmt.ey, miniEnv);
-
-            if(drawing) {
-                // draw a line
-                fileNodeJS.append(`\tcontext.lineTo(${px},${py});\n`);
-
-            } else {
-                // then update position
-                fileNodeJS.append(`\tcontext.moveTo(${px},${py});\n`);
-
-            }
-
-        } else if(isMacro(stmt)) {
-            // lookup a macro to call
-            let macro = defs.get(stmt.name);
-            // TODO line below causes the language server to crash out, probably need to look into this some more at another point.
-            // although it would be ideal to use, given the cross-ref is pre-computed & more efficient than rebuilding a map here
-            //let macro = stmt.name.ref;
-
-            if(!macro) {
-                throw new Error(`Attempted to reference an undefined macro ${stmt.name}`);
-            }
-
-            let origMiniEnv = new Map(miniEnv);
-
-            // produce pairs of string & exprs, using a tmp env
-            let tmpEnv = new Map();
-            macro.params.map((elm, idx) => tmpEnv.set(elm, evalExprWithEnv(stmt.args[idx], miniEnv)));
-            // update miniEnv w/ temp env
-            tmpEnv.forEach((v,k) => miniEnv.set(k,v));
-
-            // evalute the body
-            macro.b.body.forEach(evalStmt);
-
-            // reset env
-            miniEnv = origMiniEnv;
-
-        } else if(isFor(stmt)) {
-            // for loop bounds
-            let vi = evalExprWithEnv(stmt.e1, miniEnv);
-            let ve = evalExprWithEnv(stmt.e2, miniEnv);
-    
-            // clone binding to avoid clobbering any pre-existing binding
-            //let origBind = miniEnv.get(stmt.var);
-            let origEnv = new Map(miniEnv);
-    
-            // loop until we've performed all actions
-            while(vi < ve) {
-                miniEnv.set(stmt.var, vi);
-                stmt.b.body.forEach(evalStmt);
-                vi++;
-            }
-    
-            // restore binding to prior state
-            miniEnv = origEnv;
-            //(origBind == undefined) ? miniEnv.delete(stmt.var) : miniEnv.set(stmt.var, origBind);
-    
-        }
     }
 
-    // write the mini logo function using the commands we produced
-    model.stmts.forEach(evalStmt);
-
     // check to cap off the previous path, if still active
-    if(drawing) {
+    if(state.drawing) {
         fileNodeJS.append("\tcontext.stroke();");
     }
 
@@ -157,6 +96,105 @@ export function generateJavaScript(model: Model, filePath: string, destination: 
     return generatedFilePathHTML;
 }
 
+// effectful & recursive statement evaluation
+// Takes an env, a drawing state, and the active file node we're appending to
+function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (string | undefined)[] {
+    if(isPen(stmt)) {
+        // pen change
+        if(stmt.mode == 'up') {
+            // lift pen up & complete existing path
+            state.drawing = false;
+            return ["context.stroke()"];
+
+        } else {
+            // push pen down & start new path, moving to the current point as well
+            state.drawing = true;
+            return [`context.beginPath()`,`context.moveTo(${state.px},${state.py})`];
+
+        }
+
+    } else if(isMove(stmt)) {
+        // update pen position
+        state.px += evalExprWithEnv(stmt.ex, env);
+        state.py += evalExprWithEnv(stmt.ey, env);
+
+        if(state.drawing) {
+            // draw a line
+            return [`context.lineTo(${state.px},${state.py})`];
+
+        } else {
+            // or update the pen's position
+            return [`context.moveTo(${state.px},${state.py})`];
+
+        }
+
+    } else if(isMacro(stmt)) {
+        // get the cross ref & validate it
+        let macro = stmt.def.ref;
+        if(macro == undefined) {
+            throw new Error(`Attempted to reference an undefined macro: ${stmt.def}`);
+        }
+
+        // original env to restore post evaluation
+        let origEnv = new Map<string,number>(env);
+
+        // produce pairs of string & exprs, using a tmp env
+        // this is important to avoid mixing of params that are only present in the tmp env w/ our actual env
+        let tmpEnv = new Map<string, number>();
+
+        macro.params.map((elm, idx) => tmpEnv.set(elm.name, evalExprWithEnv(stmt.args[idx], env)));
+
+        // update miniEnv w/ temp env
+        tmpEnv.forEach((v,k) => env.set(k,v));
+
+        // evalute the body
+        let computedJS = macro.body.flatMap(s => evalStmt(s, env, state));
+
+        // reset env
+        env = origEnv;
+
+        return computedJS;
+
+    } else if(isFor(stmt)) {
+        // for loop bounds
+        let vi = evalExprWithEnv(stmt.e1, env);
+        let ve = evalExprWithEnv(stmt.e2, env);
+
+        // clone binding to avoid clobbering any pre-existing binding
+        let origEnv = new Map(env);
+
+        let fvar = stmt.var.name;
+
+        // loop until we've performed all actions
+        let computedJS : (string | undefined)[] = [];
+        while(vi < ve) {
+            // update env
+            env.set(fvar, vi);
+            // manage effects from individual evaluations
+            let rEnv = new Map(env);
+            // evalute body, and capture results
+            stmt.body.forEach(s => {
+                // get results
+                computedJS = computedJS.concat(evalStmt(s,env,state));
+                // clear effects
+                env = rEnv;
+            });
+            // step forward
+            vi++;
+        }
+
+        // restore binding to prior state
+        env = origEnv;
+
+        return computedJS;
+
+    } else {
+        // unrecognized result...
+        return [];
+
+    }
+}
+
 // Evaluates exprs to final vals for emission
 function evalExprWithEnv(e: Expr, env: MiniLogoGenEnv): number | never {
     if(isLit(e)) {
@@ -165,12 +203,15 @@ function evalExprWithEnv(e: Expr, env: MiniLogoGenEnv): number | never {
 
     } else if(isRef(e)) {
         // reference to try and find
-        let v = env.get(e.val);
-        if(v != undefined) {
-            return v;
-        } else {
-            throw new Error(`Attempted to lookup an unbound reference '${e.val}' in the env!`);
+        let r = e.val.ref;
+        if(r != undefined) {
+            let v = env.get(r.name);
+            if(v !== undefined) {
+                return v;
+            }
         }
+        // shouldn't get to this point w/ cross refs working...
+        throw new Error(`Attempted to lookup an unbound reference '${e.val}' in the env!`);
 
     } else if(isBinExpr(e)) {
         // binary expression to resolve
@@ -200,7 +241,7 @@ function evalExprWithEnv(e: Expr, env: MiniLogoGenEnv): number | never {
     } else {
         // unrecognized expression, but we shouldn't expect to get to this point
         // TODO would need better clarification on 'what' the expr was while printing out
-        throw new Error(`Unrecognized expression passed for evaluation: ${e}`);
+        throw new Error(`Unrecognized expression passed for evaluation.`);
 
     }
 

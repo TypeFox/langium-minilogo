@@ -1,0 +1,80 @@
+/*
+test.logo
+
+An example of the MiniLogo language written using the Langium framework
+
+Based on Eric Walkingshaw's MiniLogo at OSU
+    https://web.engr.oregonstate.edu/~walkiner/teaching/cs381-wi21/minilogo.html
+
+Compiles to JS that draws on a HTML canvas to achieve the end result
+*/
+
+// Draws a square at the given x,y relative offset
+// Resets back afterwards
+def square(x,y) {
+   // move to relative offset
+   move(x,y)
+   // start drawing
+   pen(down)
+   move(10,0)
+   move(0,10)
+   move(-10,0)
+   move(0,-10)
+   pen(up)
+   // reset our coordinates back, so the only effect of the square macro
+   // is that our pen state will always be 'up' on completion
+   move(-x,-y)
+}
+
+// Draws the langium logo in MiniLogo!
+def langium() {
+    // draw top portion
+    // start
+    move(230, 90)
+
+    // upper part of logo
+    pen(down)
+    move(45, 40)    // 275, 130
+    move(210, 0)    // 485, 130
+    move(-37, 80)   // 448, 210
+    move(-215, 0)   // 233, 210
+    move(-43, -40)  // 190, 170
+    move(40, -80)   // 275, 130
+    pen(up)
+
+    // lower part of logo
+    move(-50, 103)
+    pen(down)
+    // starts @ 180, 193
+    move(31, 30) // 211, 223
+
+    // crease
+    move(-61, 114) // 150, 337
+    move(81, -102) // 231, 235
+
+    move(205, 0)// 436, 235
+    move(-60, 123) // 376, 358
+    move(-86, 0) // 290, 358
+    move(-241, 179) // 49, 537
+    move(11, 17) // 60, 554
+    move(-59, 27) // 1, 581
+    move(180, -388)// 181, 193
+    pen(up)
+}
+
+// program starts w/ pen UP and 0,0 position
+// start off at 0,0
+
+// draw a 10x10 grid of squares as an example
+for x = 0 to 10 {
+    for y = 0 to 10 {
+        // prefix notation for binary ops:
+        //   add / sub / mul / div
+        // a bit easier to parse this way
+        // call the square routine with a provided x & y start
+        square(mul x 10, mul y 10)
+    }
+}
+
+// calls the langium macro, drawing a version of the logo
+langium()

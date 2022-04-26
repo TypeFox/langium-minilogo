@@ -104,11 +104,23 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
             }
           },
           {
-            "$type": "Alternatives",
+            "$type": "Keyword",
+            "value": "("
+          },
+          {
+            "$type": "Group",
             "elements": [
               {
-                "$type": "Keyword",
-                "value": "()",
+                "$type": "Assignment",
+                "feature": "params",
+                "operator": "+=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "arguments": [],
+                  "rule": {
+                    "$refText": "Param"
+                  }
+                },
                 "elements": []
               },
               {
@@ -116,7 +128,7 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
                 "elements": [
                   {
                     "$type": "Keyword",
-                    "value": "(",
+                    "value": ",",
                     "elements": []
                   },
                   {
@@ -127,54 +139,47 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
                       "$type": "RuleCall",
                       "arguments": [],
                       "rule": {
-                        "$refText": "ID"
+                        "$refText": "Param"
                       }
                     }
-                  },
-                  {
-                    "$type": "Group",
-                    "elements": [
-                      {
-                        "$type": "Keyword",
-                        "value": ",",
-                        "elements": []
-                      },
-                      {
-                        "$type": "Assignment",
-                        "feature": "params",
-                        "operator": "+=",
-                        "terminal": {
-                          "$type": "RuleCall",
-                          "arguments": [],
-                          "rule": {
-                            "$refText": "ID"
-                          }
-                        }
-                      }
-                    ],
-                    "cardinality": "*"
-                  },
-                  {
-                    "$type": "Keyword",
-                    "value": ")"
                   }
-                ]
+                ],
+                "cardinality": "*"
               }
-            ]
+            ],
+            "cardinality": "?"
           },
           {
-            "$type": "Assignment",
-            "feature": "b",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "arguments": [],
-              "rule": {
-                "$refText": "Block"
-              }
+            "$type": "Keyword",
+            "value": ")"
+          },
+          {
+            "$type": "RuleCall",
+            "arguments": [],
+            "rule": {
+              "$refText": "Block"
             }
           }
         ]
+      }
+    },
+    {
+      "$type": "ParserRule",
+      "parameters": [],
+      "name": "Param",
+      "hiddenTokens": [],
+      "alternatives": {
+        "$type": "Assignment",
+        "feature": "name",
+        "operator": "=",
+        "terminal": {
+          "$type": "RuleCall",
+          "arguments": [],
+          "rule": {
+            "$refText": "ID"
+          }
+        },
+        "elements": []
       }
     },
     {
@@ -222,23 +227,41 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
         "elements": [
           {
             "$type": "Assignment",
-            "feature": "name",
+            "feature": "def",
             "operator": "=",
             "terminal": {
-              "$type": "RuleCall",
-              "arguments": [],
-              "rule": {
-                "$refText": "ID"
+              "$type": "CrossReference",
+              "type": {
+                "$refText": "Def"
+              },
+              "terminal": {
+                "$type": "RuleCall",
+                "arguments": [],
+                "rule": {
+                  "$refText": "ID"
+                }
               }
             },
             "elements": []
           },
           {
-            "$type": "Alternatives",
+            "$type": "Keyword",
+            "value": "("
+          },
+          {
+            "$type": "Group",
             "elements": [
               {
-                "$type": "Keyword",
-                "value": "()",
+                "$type": "Assignment",
+                "feature": "args",
+                "operator": "+=",
+                "terminal": {
+                  "$type": "RuleCall",
+                  "arguments": [],
+                  "rule": {
+                    "$refText": "Expr"
+                  }
+                },
                 "elements": []
               },
               {
@@ -246,7 +269,7 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
                 "elements": [
                   {
                     "$type": "Keyword",
-                    "value": "(",
+                    "value": ",",
                     "elements": []
                   },
                   {
@@ -260,37 +283,16 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
                         "$refText": "Expr"
                       }
                     }
-                  },
-                  {
-                    "$type": "Group",
-                    "elements": [
-                      {
-                        "$type": "Keyword",
-                        "value": ",",
-                        "elements": []
-                      },
-                      {
-                        "$type": "Assignment",
-                        "feature": "args",
-                        "operator": "+=",
-                        "terminal": {
-                          "$type": "RuleCall",
-                          "arguments": [],
-                          "rule": {
-                            "$refText": "Expr"
-                          }
-                        }
-                      }
-                    ],
-                    "cardinality": "*"
-                  },
-                  {
-                    "$type": "Keyword",
-                    "value": ")"
                   }
-                ]
+                ],
+                "cardinality": "*"
               }
-            ]
+            ],
+            "cardinality": "?"
+          },
+          {
+            "$type": "Keyword",
+            "value": ")"
           }
         ]
       }
@@ -411,7 +413,7 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
               "$type": "RuleCall",
               "arguments": [],
               "rule": {
-                "$refText": "ID"
+                "$refText": "Param"
               }
             }
           },
@@ -448,15 +450,10 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
             }
           },
           {
-            "$type": "Assignment",
-            "feature": "b",
-            "operator": "=",
-            "terminal": {
-              "$type": "RuleCall",
-              "arguments": [],
-              "rule": {
-                "$refText": "Block"
-              }
+            "$type": "RuleCall",
+            "arguments": [],
+            "rule": {
+              "$refText": "Block"
             }
           }
         ]
@@ -467,6 +464,7 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
       "parameters": [],
       "name": "Block",
       "hiddenTokens": [],
+      "fragment": true,
       "alternatives": {
         "$type": "Group",
         "elements": [
@@ -575,10 +573,16 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
         "feature": "val",
         "operator": "=",
         "terminal": {
-          "$type": "RuleCall",
-          "arguments": [],
-          "rule": {
-            "$refText": "ID"
+          "$type": "CrossReference",
+          "type": {
+            "$refText": "Param"
+          },
+          "terminal": {
+            "$type": "RuleCall",
+            "arguments": [],
+            "rule": {
+              "$refText": "ID"
+            }
           }
         },
         "elements": []

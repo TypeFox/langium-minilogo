@@ -1,5 +1,5 @@
 import { ValidationAcceptor, ValidationCheck, ValidationRegistry } from 'langium';
-import { MiniLogoAstType, Model, isMacro, Def, Stmt, isCmd, Cmd, Expr, isMove, isRef, isBinExpr, isGroup, isFor, isNegExpr } from './generated/ast';
+import { MiniLogoAstType, Model, isMacro, Def, Stmt, isCmd, Cmd, Expr, isMove, isBinExpr, isGroup, isFor, isNegExpr } from './generated/ast';
 import type { MiniLogoServices } from './minilogo-module';
 
 /**
@@ -34,14 +34,7 @@ export class MiniLogoValidator {
 
     // Verify a minilogo expr, looking for undefined refs
     checkExpr(expr: Expr, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
-        if(isRef(expr) && !env.paramNames.has(expr.val)) {
-            // unbound ref
-            accept(
-                'error', 
-                `Undefined reference ${expr.val}.`, 
-                {node: expr, property: 'val'});
-
-        } else if(isBinExpr(expr)) {
+        if(isBinExpr(expr)) {
             // verify the sub-expressions
             [expr.e1, expr.e2].forEach(e => this.checkExpr(e, env, accept));
 
@@ -65,11 +58,11 @@ export class MiniLogoValidator {
         } else if(isFor(cmd)) {
             // verify For loop's body
             // update env, and check that sub exprs are OK
-            let origPar = env.paramNames.has(cmd.var);
-            env.paramNames.add(cmd.var);
-            cmd.b.body.forEach(s => this.checkStmt(s, env, accept));
+            let origPar = env.paramNames.has(cmd.var.name);
+            env.paramNames.add(cmd.var.name);
+            cmd.body.forEach(s => this.checkStmt(s, env, accept));
             // restore
-            origPar ? "" : env.paramNames.delete(cmd.var);
+            origPar ? "" : env.paramNames.delete(cmd.var.name);
 
         }
     }
@@ -77,15 +70,21 @@ export class MiniLogoValidator {
     // Verify a statement in the program within the context of known defs, & params at this point
     checkStmt(stmt: Stmt, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
         if(isMacro(stmt)) {
-            if(!env.defNames.has(stmt.name)) {
-                // undefined def
+            if(stmt.def == undefined) {
+                // bad ref
                 accept(
                     'error', 
-                    `Undefined macro ${stmt.name}! Try double checking your spelling, or add the correct macro def to your program.`, 
-                    {node: stmt, property: 'name'});
+                    `Undefined macro ${stmt.def}! Try double checking your spelling, or add the correct macro def to your program.`, 
+                    {node: stmt, property: 'def'});
+
+            } else if(stmt.args == undefined) {
+                accept(
+                    'error', 
+                    `Macro call missing arguments, or at least a () pair.`, 
+                    {node: stmt, property: 'def'});
 
             } else {
-                // verify each expr passed to this macro
+                // verify the expressions passed to this macro
                 stmt.args.forEach(e => this.checkExpr(e, env, accept));
 
             }
@@ -103,32 +102,46 @@ export class MiniLogoValidator {
 
     // Verify the model once complete
     checkModel(model: Model, accept: ValidationAcceptor): void {
-        // load all def names into a set for later validaion
-        let miniLogoEnv : MiniLogoChkEnv = {
+        // load all def names into a set for later validation
+        let env : MiniLogoChkEnv = {
             defNames: new Set<string>(model.defs.map(d => d.name)),
             paramNames: new Set<string>()
         };
         // check all raw statements, looking for macro calls, make sure those defs exist, otherwise FAIL
-        model.stmts.forEach(s => this.checkStmt(s, miniLogoEnv, accept));
+        model.stmts.forEach(s => this.checkStmt(s, env, accept));
 
         // for each def, chk statements for macro calls & refs, macro calls should exist, refs should be bound, otherwise FAIL
         model.defs.forEach(d => {
-            this.checkDef(d, miniLogoEnv, accept);
+            this.checkDef(d, env, accept);
             // flush any params we may have set
-            miniLogoEnv.paramNames.clear();
+            env.paramNames.clear();
         });
     }
 
     // Verify a definition, binding params, and verifying the subsequent list of stmts
     checkDef(def: Def, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
         // copy origin param names to restore post-verification
-        let origParamNames : Set<string> = {... env.paramNames};
+        let origParamNames = new Set<string>(env.paramNames);
+
+        if(def.params == undefined) {
+            // missing param
+            accept('error',"Missing a parameter listing.",{node: def, property: 'params'});
+            return;
+
+        }
 
         // collect param names for ref
-        def.params.forEach(p => env.paramNames.add(p));
+        def.params.forEach(p => env.paramNames.add(p.name));
+
+        if(def.body == undefined) {
+            // missing body
+            accept('error',"Missing a body of zero or more statements for this def.",{node: def, property: 'body'});
+            return;
+
+        }
 
         // verify each statement w/ these params bound
-        def.b.body.forEach(s => this.checkStmt(s, env, accept));
+        def.body.forEach(s => this.checkStmt(s, env, accept));
 
         // restore original params, if any
         env.paramNames = origParamNames;

@@ -1,4 +1,5 @@
 // mini logo example grammar
+// Written by Benjamin F. Wilson
 // based on Eric Walkingshaw's MiniLogo
 // https://web.engr.oregonstate.edu/~walkiner/teaching/cs381-wi21/minilogo.html
 
@@ -15,15 +16,22 @@ Stmt:
 
 // macro definition, w/ a body of statements
 Def:
-    'def' name=ID ('()' | '(' params+=ID (',' params+=ID)* ')') b=Block; // <-- there must be a way to use just 'Block' right?
+    'def' name=ID '(' (params+=Param (',' params+=Param)*)? ')' Block;
 
-// MiniLogo commands, these either change the pen state by position and up/down (not drawing or drawing)
+// general parameter
+Param:
+    name=ID;
+
+// MiniLogo commands, these either change the pen state by position and up/down (not drawing or drawing), or allow looping
 Cmd:
     Pen | Move | For;
 
 // calling a macro by name
 Macro:
-    name=ID ('()' | '(' args+=Expr (',' args+=Expr)* ')');
+    def=[Def:ID] '(' (args+=Expr (',' args+=Expr)*)? ')';
+    // TODO using name=[Def:ID], matching the 'name' prop on the ref, causes a crash in the language server due a cyclic structure being created
+    // prevents the reply msg from the language server from being stringified
+    // cryptic error was tough to debug, something that could be improved most likely
 
 // Pen command
 Pen:
@@ -35,10 +43,10 @@ Move:
 
 // For loop
 For:
-    'for' var=ID '=' e1=Expr 'to' e2=Expr b=Block; // <-- there must be a way to use just 'Block' right?
+    'for' var=Param '=' e1=Expr 'to' e2=Expr Block;
 
 // block of statements, used in defs & for loops
-Block:
+fragment Block:
     '{' body+=Stmt* '}';
 
 //
@@ -53,7 +61,7 @@ Lit:
 
 // expressions can be references to bound vars
 Ref:
-    val=ID;
+    val=[Param:ID]; // Xref to params
 
 // Prefix notation w/ literal op names for binary application
 BinExpr:
