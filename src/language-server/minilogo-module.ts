@@ -47,7 +47,7 @@ export const MiniLogoModule: Module<MiniLogoServices, PartialLangiumServices & M
  * @param context Optional module context with the LSP connection
  * @returns An object wrapping the shared services and the language-specific services
  */
-export function createMiniLogoServices(context?: DefaultSharedModuleContext): {
+export function createMiniLogoServices(context: DefaultSharedModuleContext): {
     shared: LangiumSharedServices,
     MiniLogo: MiniLogoServices
 } {

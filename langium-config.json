@@ -6,6 +6,9 @@
         "fileExtensions": [".logo"],
         "textMate": {
             "out": "syntaxes/minilogo.tmLanguage.json"
+        },
+        "monarch": {
+            "out": "syntaxes/minilogo.monarch.ts"
         }
     }],
     "out": "src/language-server/generated"

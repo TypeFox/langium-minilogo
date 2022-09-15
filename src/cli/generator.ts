@@ -21,6 +21,10 @@ export function generateJavaScript(model: Model, filePath: string, destination: 
     const generatedFilePathJS = `${path.join(data.destination, data.name)}.js`;
     const generatedFilePathHTML = `${path.join(data.destination, data.name)}.html`;
 
+    if (!fs.existsSync(data.destination)) {
+        fs.mkdirSync(data.destination);
+    }
+
     // write out an HTML file for our canvas ops
     const fileNodeHTML = new CompositeGeneratorNode();
     // crude literal writing

@@ -1,24 +1,23 @@
-/*
-Hello there!
+/**
+ * An example MiniLogo program
+ * Draws a simple square on the screen
  */
 
-// also a comment
-def sd() {
-    move(1,1)
-    pen(up)
-    move(0,0)
+// Draws a square at the given x,y relative offset
+// Resets back afterwards
+def square(x, y, scale) {
+
+   move( x, y )
+
+   pen(down)
+
+   move(scale,0)
+   move(0,scale)
+   move(mul -1 scale,0)
+   move(0,mul -1 scale)
+   pen(up)
+
+   move(-x,-y)
 }
 
-def sd2() {
-    move(0,0)
-}
-
-def sd3() {
-    move(1,1)
-}
-
-sd()
-
-pen(down)
-move(1,1)
-pen(up)
+square(100,100,100)

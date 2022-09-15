@@ -7,7 +7,9 @@ import type { MiniLogoServices } from './minilogo-module';
  */
 type MiniLogoChecks = { [type in MiniLogoAstType]?: ValidationCheck | ValidationCheck[] }
 
-// MiniLogo env used for validation
+/**
+ * MiniLogo env used for validation
+ */
 type MiniLogoChkEnv = {
     defNames : Set<string>,
     paramNames : Set<string>
@@ -32,42 +34,23 @@ export class MiniLogoValidationRegistry extends ValidationRegistry {
  */
 export class MiniLogoValidator {
 
-    // Verify a minilogo expr, looking for undefined refs
-    checkExpr(expr: Expr, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
-        if(isBinExpr(expr)) {
-            // verify the sub-expressions
-            [expr.e1, expr.e2].forEach(e => this.checkExpr(e, env, accept));
+    checkModel(model: Model, accept: ValidationAcceptor): void {
+        // load all def names into a set for later validation
+        let env : MiniLogoChkEnv = {
+            defNames: new Set<string>(model.defs.map(d => d.name)),
+            paramNames: new Set<string>()
+        };
+        // check all raw statements, looking for macro calls, make sure those defs exist, otherwise FAIL
+        model.stmts.forEach(s => this.checkStmt(s, env, accept));
 
-        } else if(isGroup(expr)) {
-            // verify the wrapped expr
-            this.checkExpr(expr.ge, env, accept);
-
-        } else if(isNegExpr(expr)) {
-            // verify negated expr
-            this.checkExpr(expr.ne, env, accept);
-
-        }
+        // for each def, chk statements for macro calls & refs, macro calls should exist, refs should be bound, otherwise FAIL
+        model.defs.forEach(d => {
+            this.checkDef(d, env, accept);
+            // flush any params we may have set
+            env.paramNames.clear();
+        });
     }
 
-    // Verify a minilogo cmd, only interested in the exprs used for move
-    checkCmd(cmd: Cmd, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
-        if (isMove(cmd)) {
-            // verify Move's sub expressions
-            [cmd.ex, cmd.ey].forEach(e => this.checkExpr(e, env, accept));
-
-        } else if(isFor(cmd)) {
-            // verify For loop's body
-            // update env, and check that sub exprs are OK
-            let origPar = env.paramNames.has(cmd.var.name);
-            env.paramNames.add(cmd.var.name);
-            cmd.body.forEach(s => this.checkStmt(s, env, accept));
-            // restore
-            origPar ? "" : env.paramNames.delete(cmd.var.name);
-
-        }
-    }
-
-    // Verify a statement in the program within the context of known defs, & params at this point
     checkStmt(stmt: Stmt, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
         if(isMacro(stmt)) {
             if(stmt.def == undefined) {
@@ -100,25 +83,6 @@ export class MiniLogoValidator {
         }
     }
 
-    // Verify the model once complete
-    checkModel(model: Model, accept: ValidationAcceptor): void {
-        // load all def names into a set for later validation
-        let env : MiniLogoChkEnv = {
-            defNames: new Set<string>(model.defs.map(d => d.name)),
-            paramNames: new Set<string>()
-        };
-        // check all raw statements, looking for macro calls, make sure those defs exist, otherwise FAIL
-        model.stmts.forEach(s => this.checkStmt(s, env, accept));
-
-        // for each def, chk statements for macro calls & refs, macro calls should exist, refs should be bound, otherwise FAIL
-        model.defs.forEach(d => {
-            this.checkDef(d, env, accept);
-            // flush any params we may have set
-            env.paramNames.clear();
-        });
-    }
-
-    // Verify a definition, binding params, and verifying the subsequent list of stmts
     checkDef(def: Def, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
         // copy origin param names to restore post-verification
         let origParamNames = new Set<string>(env.paramNames);
@@ -145,5 +109,35 @@ export class MiniLogoValidator {
 
         // restore original params, if any
         env.paramNames = origParamNames;
+    }
+
+    checkCmd(cmd: Cmd, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
+        if (isMove(cmd)) {
+            // verify Move's sub expressions
+            [cmd.ex, cmd.ey].forEach(e => this.checkExpr(e, env, accept));
+
+        } else if(isFor(cmd)) {
+            // verify For loop's body
+            // update env, and check that sub exprs are OK
+            let origPar = env.paramNames.has(cmd.var.name);
+            env.paramNames.add(cmd.var.name);
+            cmd.body.forEach(s => this.checkStmt(s, env, accept));
+            // restore
+            origPar ? "" : env.paramNames.delete(cmd.var.name);
+
+        }
+    }
+
+    checkExpr(expr: Expr, env: MiniLogoChkEnv, accept: ValidationAcceptor): void {
+        if(isBinExpr(expr)) {
+            [expr.e1, expr.e2].forEach(e => this.checkExpr(e, env, accept));
+
+        } else if(isGroup(expr)) {
+            this.checkExpr(expr.ge, env, accept);
+
+        } else if(isNegExpr(expr)) {
+            this.checkExpr(expr.ne, env, accept);
+
+        }
     }
 }

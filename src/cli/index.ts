@@ -2,12 +2,13 @@ import colors from 'colors';
 import { Command } from 'commander';
 import { Model } from '../language-server/generated/ast';
 import { MiniLogoLanguageMetaData } from '../language-server/generated/module';
+import { NodeFileSystem } from 'langium/node';
 import { createMiniLogoServices } from '../language-server/minilogo-module';
 import { extractAstNode } from './cli-util';
 import { generateJavaScript } from './generator';
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
-    const services = createMiniLogoServices().MiniLogo;
+    const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
     const model = await extractAstNode<Model>(fileName, services);
     const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
     console.log(colors.green(`HTML/Javascript code generated successfully: ${generatedFilePath}`));

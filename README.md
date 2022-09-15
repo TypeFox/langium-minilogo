@@ -18,7 +18,11 @@ There is, at this time, a single example in **examples/test.logo**. Which demons
 
 Notably, there is *no branching* instruction present, as there are *no booleans* present in this language.
 
-## Running
+## Running in the Web
+
+...coming soon...
+
+## Running Locally
 
 To run this simple language, you can first build up the grammar
 
@@ -33,12 +37,18 @@ After this you can generate the resulting code from the given MiniLogo test prog
 - **test.js**, a simple JS file where MiniLogo instructions are compiled into equivalent drawing commands for the canvas
 
 ```bash
-$ ./bin/cli generate examples/test.logo
+$ npm run generate:test
 ```
 
 The result is present in `examples/generated/test.html`, which you can open in your browser, and view the following.
 
 ![Image of the resulting HTML page generated test.logo](ex1.png)
+
+For a more advanced example, you can generate a program that will draw an approximation of the langium logo.
+
+```bash
+$ npm run generate:logo
+```
 
 For convenience, the pre-generated examples are included in this repo already under [/examples/generated/](https://github.com/montymxb/minilogo-langium-example/tree/main/examples/generated).
 
