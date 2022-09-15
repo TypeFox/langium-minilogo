@@ -4,7 +4,7 @@
 
 grammar MiniLogo
 
-entry Model: (stmts += Stmt | defs += Def)*;
+entry Model: (stmts+=Stmt | defs+=Def)*;
 
 // Statements
 Stmt:   Cmd | Macro;

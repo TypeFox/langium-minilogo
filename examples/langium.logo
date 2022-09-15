@@ -24,6 +24,7 @@ def square(x,y) {
    // reset our coordinates back, so the only effect of the square macro
    // is that our pen state will always be 'up' on completion
    move(-x,-y)
+
 }
 
 // Draws the langium logo in MiniLogo!

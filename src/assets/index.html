@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset='utf-8'>
+        <script src='mini-logo.js' async></script>
+        <title>MiniLogo to HTML Canvas via Langium</title>
+        <style>
+            html,body {
+                background: rgb(33,33,33);
+                font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+                color: white;
+            }
+            #minilogo-canvas {
+                display: block;
+                margin: 8px auto;
+                text-align: center;
+            }
+            #wrapper {
+                display: flex;
+                max-width: 1200px;
+                margin: 4px auto;
+                padding: 4px;
+            }
+            #wrapper .half {
+                display: flex;
+                width: 40vw;
+            }
+            @media(max-width: 1000px) {
+                #wrapper {
+                    display: block;
+                }
+                #wrapper .half {
+                    display: block;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <h1 style='text-align:center'>MiniLogo to HTML Canvas via Langium</h1>
+        <div id="wrapper">
+            <div class="half">
+                MONACO GOES HERE...
+            </div>
+            <div class="half">
+                <canvas id='minilogo-canvas' width=500 height=600></canvas>
+            </div>
+        </div>
+    </body>
+</html>

@@ -25,6 +25,16 @@
             "outFiles": [
                 "${workspaceFolder}/out/**/*.js"
             ]
-        }
+        },
+        {
+            "name": "Generate Logo",
+            "type": "node",
+            "program": "${workspaceFolder}/bin/cli",
+            "request": "launch",
+            "args": [
+                "generate",
+                "./examples/langium.logo"
+            ]
+        },
     ]
 }
