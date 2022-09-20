@@ -21,7 +21,7 @@ Notably, there is *no branching* instruction present, as there are *no booleans*
 
 ## Running in the Web
 
-![Image of the resulting HTML page generated test.logo](./m2.png)
+<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m2.jpg" width=500 alt="Image of Langium running standalone in the Browser">
 
 To run these examples standalone in the web, you need to first build the regular application, and then build & copy assets over for usage in browsers.
 
@@ -72,7 +72,7 @@ $ npm run generate:test
 
 The result is present in `examples/generated/test/index.html`, which you can open in your browser, and view the following.
 
-![Image of the resulting HTML page generated test.logo](./m1.png)
+<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
 
 For a more advanced example, you can generate a program that will draw an approximation of the langium logo.
 
