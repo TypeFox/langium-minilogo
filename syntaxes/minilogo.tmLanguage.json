@@ -10,7 +10,7 @@
     },
     {
       "name": "keyword.control.minilogo",
-      "match": "\\b(add|def|div|down|for|move|mul|pen|sub|to|up)\\b"
+      "match": "\\b(color|def|down|for|move|pen|to|up)\\b"
     }
   ],
   "repository": {

@@ -9,24 +9,6 @@ Based on Eric Walkingshaw's MiniLogo at OSU
 Compiles to JS that draws on a HTML canvas to achieve the end result
 */
 
-// Draws a square at the given x,y relative offset
-// Resets back afterwards
-def square(x,y) {
-   // move to relative offset
-   move(x,y)
-   // start drawing
-   pen(down)
-   move(10,0)
-   move(0,10)
-   move(-10,0)
-   move(0,-10)
-   pen(up)
-   // reset our coordinates back, so the only effect of the square macro
-   // is that our pen state will always be 'up' on completion
-   move(-x,-y)
-
-}
-
 // Draws the langium logo in MiniLogo!
 def langium() {
     // draw top portion
@@ -66,16 +48,6 @@ def langium() {
 // program starts w/ pen UP and 0,0 position
 // start off at 0,0
 
-// draw a 10x10 grid of squares as an example
-for x = 0 to 10 {
-    for y = 0 to 10 {
-        // prefix notation for binary ops:
-        //   add / sub / mul / div
-        // a bit easier to parse this way
-        // call the square routine with a provided x & y start
-        square(mul x 10, mul y 10)
-    }
-}
-
 // calls the langium macro, drawing a version of the logo
+color(#26888C)
 langium()

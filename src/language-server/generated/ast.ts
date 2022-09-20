@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { AstNode, AstReflection, Reference, isAstNode, TypeMetaData } from 'langium';
 
-export type Cmd = For | Move | Pen;
+export type Cmd = Color | For | Move | Pen;
 
 export const Cmd = 'Cmd';
 
@@ -15,12 +15,20 @@ export function isCmd(item: unknown): item is Cmd {
     return reflection.isInstance(item, Cmd);
 }
 
-export type Expr = BinExpr | Group | Lit | NegExpr | Ref;
+export type Expr = BinExpr | PrimExpr;
 
 export const Expr = 'Expr';
 
 export function isExpr(item: unknown): item is Expr {
     return reflection.isInstance(item, Expr);
+}
+
+export type PrimExpr = Group | Lit | NegExpr | Ref;
+
+export const PrimExpr = 'PrimExpr';
+
+export function isPrimExpr(item: unknown): item is PrimExpr {
+    return reflection.isInstance(item, PrimExpr);
 }
 
 export type Stmt = Cmd | Macro;
@@ -32,10 +40,10 @@ export function isStmt(item: unknown): item is Stmt {
 }
 
 export interface BinExpr extends AstNode {
-    readonly $container: BinExpr | For | Group | Macro | Move | NegExpr;
-    e1: Expr
-    e2: Expr
-    op: BinOp
+    readonly $container: BinExpr | Color | For | Group | Macro | Move | NegExpr;
+    e1: Expr | PrimExpr
+    e2: Expr | PrimExpr
+    op: '*' | '+' | '-' | '/'
 }
 
 export const BinExpr = 'BinExpr';
@@ -44,15 +52,18 @@ export function isBinExpr(item: unknown): item is BinExpr {
     return reflection.isInstance(item, BinExpr);
 }
 
-export interface BinOp extends AstNode {
-    readonly $container: BinExpr;
-    val: 'add' | 'div' | 'mul' | 'sub'
+export interface Color extends AstNode {
+    readonly $container: Def | For | Model;
+    b?: Expr
+    color?: string
+    g?: Expr
+    r?: Expr
 }
 
-export const BinOp = 'BinOp';
+export const Color = 'Color';
 
-export function isBinOp(item: unknown): item is BinOp {
-    return reflection.isInstance(item, BinOp);
+export function isColor(item: unknown): item is Color {
+    return reflection.isInstance(item, Color);
 }
 
 export interface Def extends AstNode {
@@ -83,7 +94,7 @@ export function isFor(item: unknown): item is For {
 }
 
 export interface Group extends AstNode {
-    readonly $container: BinExpr | For | Group | Macro | Move | NegExpr;
+    readonly $container: BinExpr | Color | For | Group | Macro | Move | NegExpr;
     ge: Expr
 }
 
@@ -94,7 +105,7 @@ export function isGroup(item: unknown): item is Group {
 }
 
 export interface Lit extends AstNode {
-    readonly $container: BinExpr | For | Group | Macro | Move | NegExpr;
+    readonly $container: BinExpr | Color | For | Group | Macro | Move | NegExpr;
     val: number
 }
 
@@ -140,7 +151,7 @@ export function isMove(item: unknown): item is Move {
 }
 
 export interface NegExpr extends AstNode {
-    readonly $container: BinExpr | For | Group | Macro | Move | NegExpr;
+    readonly $container: BinExpr | Color | For | Group | Macro | Move | NegExpr;
     ne: Expr
 }
 
@@ -173,7 +184,7 @@ export function isPen(item: unknown): item is Pen {
 }
 
 export interface Ref extends AstNode {
-    readonly $container: BinExpr | For | Group | Macro | Move | NegExpr;
+    readonly $container: BinExpr | Color | For | Group | Macro | Move | NegExpr;
     val: Reference<Param>
 }
 
@@ -183,14 +194,14 @@ export function isRef(item: unknown): item is Ref {
     return reflection.isInstance(item, Ref);
 }
 
-export type MiniLogoAstType = 'BinExpr' | 'BinOp' | 'Cmd' | 'Def' | 'Expr' | 'For' | 'Group' | 'Lit' | 'Macro' | 'Model' | 'Move' | 'NegExpr' | 'Param' | 'Pen' | 'Ref' | 'Stmt';
+export type MiniLogoAstType = 'BinExpr' | 'Cmd' | 'Color' | 'Def' | 'Expr' | 'For' | 'Group' | 'Lit' | 'Macro' | 'Model' | 'Move' | 'NegExpr' | 'Param' | 'Pen' | 'PrimExpr' | 'Ref' | 'Stmt';
 
 export type MiniLogoAstReference = 'Macro:def' | 'Ref:val';
 
 export class MiniLogoAstReflection implements AstReflection {
 
     getAllTypes(): string[] {
-        return ['BinExpr', 'BinOp', 'Cmd', 'Def', 'Expr', 'For', 'Group', 'Lit', 'Macro', 'Model', 'Move', 'NegExpr', 'Param', 'Pen', 'Ref', 'Stmt'];
+        return ['BinExpr', 'Cmd', 'Color', 'Def', 'Expr', 'For', 'Group', 'Lit', 'Macro', 'Model', 'Move', 'NegExpr', 'Param', 'Pen', 'PrimExpr', 'Ref', 'Stmt'];
     }
 
     isInstance(node: unknown, type: string): boolean {
@@ -203,16 +214,20 @@ export class MiniLogoAstReflection implements AstReflection {
         }
         switch (subtype) {
             case BinExpr:
-            case Group:
-            case Lit:
-            case NegExpr:
-            case Ref: {
+            case PrimExpr: {
                 return this.isSubtype(Expr, supertype);
             }
+            case Color:
             case For:
             case Move:
             case Pen: {
                 return this.isSubtype(Cmd, supertype);
+            }
+            case Group:
+            case Lit:
+            case NegExpr:
+            case Ref: {
+                return this.isSubtype(PrimExpr, supertype);
             }
             case Macro:
             case Cmd: {

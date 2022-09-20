@@ -13,11 +13,27 @@ def square(x, y, scale) {
 
    move(scale,0)
    move(0,scale)
-   move(mul -1 scale,0)
-   move(0,mul -1 scale)
+   move(-1 * scale,0)
+   move(0,-1 * scale)
    pen(up)
 
    move(-x,-y)
 }
 
 square(100,100,100)
+
+move(100,100)
+
+color(blue)
+
+// draw a 10x10 grid of squares as an example
+for x = 0 to 10 {
+    for y = 0 to 10 {
+        // prefix notation for binary ops:
+        //   add / sub / mul / div
+        // a bit easier to parse this way
+        // call the square routine with a provided x & y start
+        // color(x*10, y*10, (x + y) * 10)
+        square(x * 10, y * 10, 10)
+    }
+}

@@ -8,7 +8,7 @@ entry Model: (stmts+=Stmt | defs+=Def)*;
 
 // Statements
 Stmt:   Cmd | Macro;
-Cmd:    Pen | Move | For;
+Cmd:    Pen | Move | Color | For;
 Macro:  def=[Def:ID] '(' (args+=Expr (',' args+=Expr)*)? ')';
 
 // Definitions
@@ -17,6 +17,7 @@ Def:    'def' name=ID '(' (params+=Param (',' params+=Param)*)? ')' Block;
 // Commands
 Pen:    'pen' '(' mode=('up' | 'down') ')';
 Move:   'move' '(' ex=Expr ',' ey=Expr ')';
+Color:  'color' '(' ((r = Expr ',' g=Expr ',' b=Expr) | color=ID | color=HEX) ')';
 For:    'for' var=Param '=' e1=Expr 'to' e2=Expr Block;
 
 
@@ -26,15 +27,22 @@ Param: name=ID;
 
 
 // Expressions
-Expr:       Lit | Ref | BinExpr | Group | NegExpr;
+Expr: Add;
+
+Add  infers Expr: 
+    Mult     ({infer BinExpr.e1=current} op=('+'|'-') e2=Mult)*;
+Mult infers Expr: 
+    PrimExpr ({infer BinExpr.e1=current} op=('*'|'/') e2=PrimExpr)*;
+
+PrimExpr: Lit | Ref | Group | NegExpr;
+
 Lit:        val=INT;
 Ref:        val=[Param:ID];
-BinExpr:    op=BinOp e1=Expr e2=Expr;
-BinOp:      val=('add' | 'sub' | 'mul' | 'div');
 Group:      '(' ge=Expr ')';
 NegExpr:    '-' ne=Expr;
 
 // Terminals
+terminal HEX returns string:    /#(\d|[a-zA-Z])+/;
 terminal ID returns string:     /[_a-zA-Z][\w_]*/;
 terminal INT returns number:    /-?[0-9]+/;
 hidden terminal WS:             /\s+/;

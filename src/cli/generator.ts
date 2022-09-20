@@ -1,8 +1,5 @@
-import fs from 'fs';
 import { CompositeGeneratorNode, NL, processGeneratorNode } from 'langium';
-import path from 'path';
-import { isPen, isMove, isLit, isMacro, isGroup, Stmt, Model, Expr, isRef, isBinExpr, isFor, isNegExpr } from '../language-server/generated/ast';
-import { extractDestinationAndName } from './cli-util';
+import { isPen, isMove, isLit, isMacro, isGroup, Stmt, Model, Expr, isRef, isBinExpr, isFor, isColor, isNegExpr, Def } from '../language-server/generated/ast';
 
 // Map binds final values to names for references to function
 type MiniLogoGenEnv = Map<string,number>;
@@ -16,36 +13,21 @@ type DrawingState = {
     drawing: boolean
 };
 
-export function generateJavaScript(model: Model, filePath: string, destination: string | undefined): string {
-    const data = extractDestinationAndName(filePath, destination);
-    const generatedFilePathJS = path.join(data.destination, 'mini-logo.js');
-    const generatedFilePathHTML = `${path.join(data.destination, data.name)}.html`;
+/**
+ * Generates raw javascript from a MiniLogo Model
+ * @param model Model to generate JS from
+ * @returns Generated JS that captures the program's intent
+ */
+export function generateJavaScript(model: Model): string {
 
-    if (!fs.existsSync(data.destination)) {
-        fs.mkdirSync(data.destination, { recursive: true });
-    }
-
-    fs.writeFileSync(generatedFilePathHTML, fs.readFileSync('./src/assets/index.html'));
-
-    // write a JS file that draws on the HTML canvas from
+    // Produce JS that draws on the HTML canvas
     // we'll start a `run_minilogo` function, and then generate our 
     // minilogo program into equivalent draw instructions for the canvas
     const fileNodeJS = new CompositeGeneratorNode();
     fileNodeJS.append(
-        '"use strict";', NL, NL,
-        "function run_minilogo() {", NL
+        "// Generated MiniLogo Commands", NL,
+        "MINI_LOGO_COMMANDS = [", NL
     );
-
-    fileNodeJS.indent(i => {
-        i.append(
-            "let canvas = document.getElementById('minilogo-canvas');", NL,
-            "let context = canvas.getContext('2d');", NL,
-            "let mode = 'down';", NL,
-            "context.strokeStyle = 'white';", NL,
-            "context.moveTo(150,150);", NL,
-            "context.beginPath();", NL
-        );
-    });
 
     // setup drawing state
     let state : DrawingState = {
@@ -64,7 +46,7 @@ export function generateJavaScript(model: Model, filePath: string, destination: 
             // good to go
             computedJS.forEach(line => {
                 if (line) {
-                    i.append(line, ';', NL);
+                    i.append(JSON.stringify(line), ',', NL);
                 }
             });
         });
@@ -75,57 +57,55 @@ export function generateJavaScript(model: Model, filePath: string, destination: 
 
     }
 
-    // check to cap off the previous path, if still active
-    if(state.drawing) {
-        fileNodeJS.append("\tcontext.stroke()");
-    }
-
     // cap off our JS
     fileNodeJS.append(
-        "}", NL,
-        "window.onload = run_minilogo()", NL, NL
+        "];", NL,
     );
 
-    fs.writeFileSync(generatedFilePathJS, processGeneratorNode(fileNodeJS));
-
-    return generatedFilePathHTML;
+    return processGeneratorNode(fileNodeJS);
 }
 
-// effectful & recursive statement evaluation
-// Takes an env, a drawing state, and the active file node we're appending to
-function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (string | undefined)[] {
+/**
+ * Takes an env, a drawing state, and the active file node we're appending to
+ * Effectful & recursive statement evaluation
+ */
+function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (Object | undefined)[] {
     if(isPen(stmt)) {
-        // pen change
         if(stmt.mode === 'up') {
-            // lift pen up & complete existing path
             state.drawing = false;
-            return ["context.stroke()"];
-
+            return [{
+                cmd: 'penUp'
+            }];
         } else {
-            // push pen down & start new path, moving to the current point as well
             state.drawing = true;
-            return [`context.beginPath()`, `context.moveTo(${state.px},${state.py})`];
-
+            return [{
+                cmd: 'penDown'
+            }];
         }
 
     } else if(isMove(stmt)) {
         // update pen position
-        state.px += evalExprWithEnv(stmt.ex, env);
-        state.py += evalExprWithEnv(stmt.ey, env);
+        let cmds: Object[] = [{
+            cmd: 'move',
+            x: evalExprWithEnv(stmt.ex, env),
+            y: evalExprWithEnv(stmt.ey, env)
+        }];
 
-        if(state.drawing) {
-            // draw a line
-            return [`context.lineTo(${state.px},${state.py})`];
+        if (state.drawing) {
+            cmds.push({ cmd: 'penUp' });
+            cmds.push({ cmd: 'penDown' });
         } else {
-            // or update the pen's position
-            return [`context.moveTo(${state.px},${state.py})`];
+            cmds.push({ cmd: 'penDown' });
+            cmds.push({ cmd: 'penUp' });
         }
+
+        return cmds;
 
     } else if(isMacro(stmt)) {
         // get the cross ref & validate it
-        let macro = stmt.def.ref;
+        let macro: Def | undefined = stmt.def.ref;
         if(macro === undefined) {
-            throw new Error(`Attempted to reference an undefined macro: ${stmt.def}`);
+            throw new Error(stmt.def.error?.message ?? `Attempted to reference an undefined macro: ${stmt.def.$refText}`);
         }
 
         // original env to restore post evaluation
@@ -145,7 +125,7 @@ function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (strin
         let vi = evalExprWithEnv(stmt.e1, env);
         let ve = evalExprWithEnv(stmt.e2, env);
 
-        let computedJS : (string | undefined)[] = [];
+        let computedJS : (Object | undefined)[] = [];
         
         // perform loop
         const loopEnv = new Map(env);
@@ -158,8 +138,19 @@ function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (strin
 
         return computedJS;
 
+    } else if (isColor(stmt)) {
+        // apply color to stroke
+        if (stmt.color) {
+            return [{cmd:'color', color: stmt.color}]
+        } else {
+            const r = evalExprWithEnv(stmt.r!, env);
+            const g = evalExprWithEnv(stmt.g!, env);
+            const b = evalExprWithEnv(stmt.b!, env);
+            return [{cmd:'color', r, g, b}]
+        }
+
     } else {
-        return [];
+        throw new Error('Unrecognized Statement encountered: ' + (stmt as any)?.$type ?? 'Unknown Type');
     }
 }
 
@@ -173,18 +164,18 @@ function evalExprWithEnv(e: Expr, env: MiniLogoGenEnv): number {
         if (v !== undefined) {
             return v;
         }
-        throw new Error(`Attempted to lookup an unbound reference '${e.val}' in the env.`);
+        throw new Error(e.val.error?.message ?? `Attempted to lookup an unbound reference '${e.val.$refText}' in the env.`);
 
     } else if(isBinExpr(e)) {
-        let opval = e.op.val;
+        let opval = e.op;
         let v1    = evalExprWithEnv(e.e1, env);
         let v2    = evalExprWithEnv(e.e2, env);
 
         switch(opval) {
-            case 'add': return v1 + v2;
-            case 'sub': return v1 - v2;
-            case 'mul': return v1 * v2;
-            case 'div': return v1 / v2;
+            case '+': return v1 + v2;
+            case '-': return v1 - v2;
+            case '*': return v1 * v2;
+            case '/': return v1 / v2;
             default:    throw new Error(`Unrecognized bin op passed: ${opval}`);
         }
         
@@ -196,6 +187,6 @@ function evalExprWithEnv(e: Expr, env: MiniLogoGenEnv): number {
 
     }
 
-    throw new Error('Unhandled Expression');
+    throw new Error('Unhandled Expression: ' + e);
 
 }

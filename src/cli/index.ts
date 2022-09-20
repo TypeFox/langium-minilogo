@@ -1,17 +1,37 @@
 import colors from 'colors';
+import fs from 'fs';
 import { Command } from 'commander';
 import { Model } from '../language-server/generated/ast';
 import { MiniLogoLanguageMetaData } from '../language-server/generated/module';
 import { NodeFileSystem } from 'langium/node';
 import { createMiniLogoServices } from '../language-server/minilogo-module';
-import { extractAstNode } from './cli-util';
+import { extractAstNode, extractDestinationAndName } from './cli-util';
 import { generateJavaScript } from './generator';
+import path from 'path';
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
     const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
     const model = await extractAstNode<Model>(fileName, services);
-    const generatedFilePath = generateJavaScript(model, fileName, opts.destination);
-    console.log(colors.green(`HTML/Javascript code generated successfully: ${generatedFilePath}`));
+    const generatedJS = generateJavaScript(model);
+
+    const data = extractDestinationAndName(fileName, opts.destination);
+    const dest = path.join(data.destination, data.name);
+    const generatedFileJSPath = path.join(dest, 'mini-logo.js');
+    const generatedFileHTMLPath = path.join(dest, 'index.html');
+
+    if (!fs.existsSync(dest)) {
+        fs.mkdirSync(dest, { recursive: true });
+    }
+
+    // read mini-logo, and add generated JS to it
+    const fileContents = fs.readFileSync(fileName);
+    const baseJsContent = fs.readFileSync('./src/static/mini-logo.js');
+    const programText = `\n\nconst LOGO_PROGRAM_TEXT = \`${fileContents}\`;`;
+
+    fs.writeFileSync(generatedFileJSPath, baseJsContent + '\n\n' + generatedJS + '\n\n' + programText);
+    fs.writeFileSync(generatedFileHTMLPath, fs.readFileSync('./src/static/index.html'));
+
+    console.log(colors.green(`HTML/Javascript code generated successfully: ${generatedFileHTMLPath}`));
 };
 
 export type GenerateOptions = {
