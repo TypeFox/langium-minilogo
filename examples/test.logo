@@ -24,7 +24,7 @@ square(100,100,100)
 
 move(100,100)
 
-color(blue)
+color(cyan)
 
 // draw a 10x10 grid of squares as an example
 for x = 0 to 10 {

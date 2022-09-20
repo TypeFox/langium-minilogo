@@ -1,5 +1,4 @@
 node_modules/
 out/
-examples/generated/*.js
-examples/generated/*.html
+examples/generated
 .DS_Store

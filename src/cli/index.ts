@@ -6,7 +6,7 @@ import { MiniLogoLanguageMetaData } from '../language-server/generated/module';
 import { NodeFileSystem } from 'langium/node';
 import { createMiniLogoServices } from '../language-server/minilogo-module';
 import { extractAstNode, extractDestinationAndName } from './cli-util';
-import { generateJavaScript } from './generator';
+import { generateJavaScript } from '../generator/generator';
 import path from 'path';
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
