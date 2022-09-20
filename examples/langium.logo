@@ -1,12 +1,7 @@
 /*
-test.logo
+langium.logo
 
 An example of the MiniLogo language written using the Langium framework
-
-Based on Eric Walkingshaw's MiniLogo at OSU
-    https://web.engr.oregonstate.edu/~walkiner/teaching/cs381-wi21/minilogo.html
-
-Compiles to JS that draws on a HTML canvas to achieve the end result
 */
 
 // Draws the langium logo in MiniLogo!

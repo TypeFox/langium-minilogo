@@ -21,7 +21,7 @@ Notably, there is *no branching* instruction present, as there are *no booleans*
 
 ## Running in the Web
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m2.jpg" width=500 alt="Image of Langium running standalone in the Browser">
+<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
 
 To run these examples standalone in the web, you need to first build the regular application, and then build & copy assets over for usage in browsers.
 
