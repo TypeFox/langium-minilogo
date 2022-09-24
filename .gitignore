@@ -2,3 +2,4 @@ node_modules/
 out/
 examples/generated
 .DS_Store
+*.vsix

@@ -42,7 +42,7 @@ Group:      '(' ge=Expr ')';
 NegExpr:    '-' ne=Expr;
 
 // Terminals
-terminal HEX returns string:    /#(\d|[a-zA-Z])+/;
+terminal HEX returns string:    /#(\d|[a-fA-F])+/;
 terminal ID returns string:     /[_a-zA-Z][\w_]*/;
 terminal INT returns number:    /-?[0-9]+/;
 hidden terminal WS:             /\s+/;

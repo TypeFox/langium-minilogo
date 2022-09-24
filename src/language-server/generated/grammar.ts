@@ -952,7 +952,7 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ||(loadedMin
       },
       "definition": {
         "$type": "RegexToken",
-        "regex": "#(\\\\d|[a-zA-Z])+"
+        "regex": "#(\\\\d|[a-fA-F])+"
       },
       "fragment": false,
       "hidden": false

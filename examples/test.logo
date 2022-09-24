@@ -22,17 +22,15 @@ def square(x, y, scale) {
    move(-x,-y)
 }
 
-square(100,100,100)
+square(100,100,300)
 
 move(100,100)
-
-color(cyan)
 
 // draw a 10x10 grid of squares as an example
 for x = 0 to 10 {
     for y = 0 to 10 {
         // call the square routine with a provided x & y start
-        // color(x*10, y*10, (x + y) * 10)
-        square(x * 10, y * 10, 10)
+        color(x*30, y*30, (x + y) * 30)
+        square(x * 30, y * 30, 30)
     }
 }

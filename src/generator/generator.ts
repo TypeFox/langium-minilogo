@@ -23,12 +23,23 @@ export function generateJavaScript(model: Model): string {
     // Produce JS that draws on the HTML canvas
     // we'll start a `run_minilogo` function, and then generate our 
     // minilogo program into equivalent draw instructions for the canvas
+    const fileNodeJS = generateStart();
+    generateStatements(fileNodeJS, model.stmts);
+    generateEnd(fileNodeJS);
+
+    return processGeneratorNode(fileNodeJS);
+}
+
+function generateStart(): CompositeGeneratorNode {
     const fileNodeJS = new CompositeGeneratorNode();
     fileNodeJS.append(
         "// Generated MiniLogo Commands", NL,
         "MINI_LOGO_COMMANDS = [", NL
     );
+    return fileNodeJS;
+}
 
+function generateStatements(fileNodeJS: CompositeGeneratorNode, stmts: Stmt[]) {
     // setup drawing state
     let state : DrawingState = {
         px: 0,
@@ -40,7 +51,7 @@ export function generateJavaScript(model: Model): string {
     let env : MiniLogoGenEnv = new Map<string,number>();
 
     // write the mini logo function using the commands we produced, and write them out
-    let computedJS = model.stmts.flatMap(s => evalStmt(s,env,state));
+    let computedJS = stmts.flatMap(s => evalStmt(s,env,state));
     if(computedJS !== undefined) {
         fileNodeJS.indent(i => {
             // good to go
@@ -56,13 +67,13 @@ export function generateJavaScript(model: Model): string {
         throw new Error("Failed to generate MiniLogo program to JS draw instructions!");
 
     }
+}
 
+function generateEnd(fileNodeJS: CompositeGeneratorNode) {
     // cap off our JS
     fileNodeJS.append(
         "];", NL,
     );
-
-    return processGeneratorNode(fileNodeJS);
 }
 
 /**
