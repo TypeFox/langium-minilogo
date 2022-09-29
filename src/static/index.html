@@ -181,7 +181,9 @@
             window.updateLogoCanvas = (async () => {
                 console.info('generating & running current code...');
                 const value = client.editor.getValue();
-                updateMiniLogoCanvas(eval(await MiniLogo.parseAndGenerate(value)));
+                // parse & generate new command stack for drawing a new image
+                const minilogoCmds = await MiniLogo.parseAndGenerate(value);
+                updateMiniLogoCanvas(minilogoCmds);
             });
         </script>
     </body>

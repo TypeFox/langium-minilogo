@@ -6,13 +6,14 @@ import { MiniLogoLanguageMetaData } from '../language-server/generated/module';
 import { NodeFileSystem } from 'langium/node';
 import { createMiniLogoServices } from '../language-server/minilogo-module';
 import { extractAstNode, extractDestinationAndName } from './cli-util';
-import { generateJavaScript } from '../generator/generator';
+import { generateMiniLogoCmds } from '../generator/generator';
 import path from 'path';
+import { CompositeGeneratorNode, NL, processGeneratorNode } from 'langium';
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
     const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
     const model = await extractAstNode<Model>(fileName, services);
-    const generatedJS = generateJavaScript(model);
+    const generatedJS = getCmdStackString(model);
 
     const data = extractDestinationAndName(fileName, opts.destination);
     const dest = path.join(data.destination, data.name);
@@ -24,7 +25,7 @@ export const generateAction = async (fileName: string, opts: GenerateOptions): P
     }
 
     // read mini-logo, and add generated JS to it
-    const fileContents = fs.readFileSync(fileName);
+    const fileContents = fs.readFileSync(fileName).toString('utf-8').replaceAll(/`/g, '\\`');
     const baseJsContent = fs.readFileSync('./src/static/mini-logo.js');
     const programText = `\n\nconst LOGO_PROGRAM_TEXT = \`${fileContents}\`;`;
 
@@ -34,6 +35,39 @@ export const generateAction = async (fileName: string, opts: GenerateOptions): P
     console.log(colors.green(`HTML/Javascript code generated successfully: ${generatedFileHTMLPath}`));
 };
 
+/**
+ * Gets the command stack as a string
+ * @param model Model to extract command stack from
+ * @returns String to add to JS
+ */
+function getCmdStackString(model: Model): string {
+    const generatedCmds = generateMiniLogoCmds(model);
+
+    // build output JS so something draws to the canvas on load, quickly
+    const fileNodeJS = new CompositeGeneratorNode();
+    fileNodeJS.append(
+        "// Generated MiniLogo Commands", NL,
+        "MINI_LOGO_COMMANDS = [", NL
+    );
+    fileNodeJS.append();
+
+    // add cmds
+    if(generatedCmds !== undefined) {
+        fileNodeJS.indent(i => {
+            generatedCmds.forEach(cmd => {
+                i.append(JSON.stringify(cmd), ',', NL);
+            });
+        });
+    }
+
+    // cap off
+    fileNodeJS.append(
+        "];", NL,
+    );
+
+    return processGeneratorNode(fileNodeJS);
+}
+
 export type GenerateOptions = {
     destination?: string;
 }
@@ -41,9 +75,7 @@ export type GenerateOptions = {
 export default function(): void {
     const program = new Command();
 
-    program
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        .version(require('../../package.json').version);
+    program.version(require('../../package.json').version);
 
     const fileExtensions = MiniLogoLanguageMetaData.fileExtensions.join(', ');
     program

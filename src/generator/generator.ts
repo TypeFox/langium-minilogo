@@ -1,4 +1,3 @@
-import { CompositeGeneratorNode, NL, processGeneratorNode } from 'langium';
 import { isPen, isMove, isLit, isMacro, isGroup, Stmt, Model, Expr, isRef, isBinExpr, isFor, isColor, isNegExpr, Def } from '../language-server/generated/ast';
 
 // Map binds final values to names for references to function
@@ -14,32 +13,15 @@ type DrawingState = {
 };
 
 /**
- * Generates raw javascript from a MiniLogo Model
- * @param model Model to generate JS from
- * @returns Generated JS that captures the program's intent
+ * Generates simple drawing commands from a MiniLogo Model
+ * @param model Model to generate commmands from
+ * @returns Generated commands that captures the program's drawing intent
  */
-export function generateJavaScript(model: Model): string {
-
-    // Produce JS that draws on the HTML canvas
-    // we'll start a `run_minilogo` function, and then generate our 
-    // minilogo program into equivalent draw instructions for the canvas
-    const fileNodeJS = generateStart();
-    generateStatements(fileNodeJS, model.stmts);
-    generateEnd(fileNodeJS);
-
-    return processGeneratorNode(fileNodeJS);
+export function generateMiniLogoCmds(model: Model): Object[] {
+    return generateStatements(model.stmts);
 }
 
-function generateStart(): CompositeGeneratorNode {
-    const fileNodeJS = new CompositeGeneratorNode();
-    fileNodeJS.append(
-        "// Generated MiniLogo Commands", NL,
-        "MINI_LOGO_COMMANDS = [", NL
-    );
-    return fileNodeJS;
-}
-
-function generateStatements(fileNodeJS: CompositeGeneratorNode, stmts: Stmt[]) {
+function generateStatements(stmts: Stmt[]): Object[] {
     // setup drawing state
     let state : DrawingState = {
         px: 0,
@@ -50,30 +32,8 @@ function generateStatements(fileNodeJS: CompositeGeneratorNode, stmts: Stmt[]) {
     // minilogo evaluation env
     let env : MiniLogoGenEnv = new Map<string,number>();
 
-    // write the mini logo function using the commands we produced, and write them out
-    let computedJS = stmts.flatMap(s => evalStmt(s,env,state));
-    if(computedJS !== undefined) {
-        fileNodeJS.indent(i => {
-            // good to go
-            computedJS.forEach(line => {
-                if (line) {
-                    i.append(JSON.stringify(line), ',', NL);
-                }
-            });
-        });
-        
-    } else {
-        // failed to generate JS
-        throw new Error("Failed to generate MiniLogo program to JS draw instructions!");
-
-    }
-}
-
-function generateEnd(fileNodeJS: CompositeGeneratorNode) {
-    // cap off our JS
-    fileNodeJS.append(
-        "];", NL,
-    );
+    // generate mini logo cmds off of statements
+    return stmts.flatMap(s => evalStmt(s,env,state)).filter(e => e !== undefined) as Object[];
 }
 
 /**

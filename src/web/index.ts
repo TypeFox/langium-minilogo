@@ -1,6 +1,6 @@
 import { Model } from '../language-server/generated/ast';
 import { createMiniLogoServices } from '../language-server/minilogo-module';
-import { generateJavaScript } from '../generator/generator';
+import { generateMiniLogoCmds } from '../generator/generator';
 import { AstNode, EmptyFileSystem, LangiumServices } from 'langium';
 import { URI } from 'vscode-uri';
 
@@ -9,10 +9,12 @@ import { URI } from 'vscode-uri';
  * @param miniLogoProgram MiniLogo program to parse
  * @returns Generated Javascript code from this MiniLogo program
  */
-export async function parseAndGenerate (miniLogoProgram: string): Promise<string> {
+export async function parseAndGenerate (miniLogoProgram: string): Promise<Object[]> {
     const services = createMiniLogoServices(EmptyFileSystem).MiniLogo;
     const model = await extractAstNodeFromString<Model>(miniLogoProgram, services);
-    return Promise.resolve(generateJavaScript(model));
+    // generate mini logo drawing commands from the model
+    const cmds = generateMiniLogoCmds(model);
+    return Promise.resolve(cmds);
 }
 
 /**
