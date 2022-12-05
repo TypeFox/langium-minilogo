@@ -52,7 +52,7 @@ At a high-level, updating the canvas works by:
 - the front-end proceses these drawing instructions using a very simple stack-based machine
 - the machine drives visual updates to the canvas
 
-This is a hyper generalization of each step, but the deatils can be explored by checking out [Langium's tutorials](https://langium.org/tutorials/).
+This is a hyper generalization of each step, but should be sufficient to get a good idea of how this example implementation works.
 
 ## Running Locally
 
