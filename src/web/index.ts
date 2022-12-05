@@ -5,9 +5,9 @@ import { AstNode, EmptyFileSystem, LangiumServices } from 'langium';
 import { URI } from 'vscode-uri';
 
 /**
- * Parses a MiniLogo program & generates Javascript code as a string
+ * Parses a MiniLogo program & generates output as a list of Objects
  * @param miniLogoProgram MiniLogo program to parse
- * @returns Generated Javascript code from this MiniLogo program
+ * @returns Generated output from this MiniLogo program
  */
 export async function parseAndGenerate (miniLogoProgram: string): Promise<Object[]> {
     const services = createMiniLogoServices(EmptyFileSystem).MiniLogo;

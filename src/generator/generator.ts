@@ -74,12 +74,12 @@ function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (Objec
 
     } else if(isMacro(stmt)) {
         // get the cross ref & validate it
-        let macro: Def | undefined = stmt.def.ref;
+        const macro: Def | undefined = stmt.def.ref;
         if(macro === undefined) {
             throw new Error(stmt.def.error?.message ?? `Attempted to reference an undefined macro: ${stmt.def.$refText}`);
         }
 
-        // original env to restore post evaluation
+        // copied env
         let macroEnv = new Map(env);
 
         // produce pairs of string & exprs, using a tmp env
@@ -96,18 +96,18 @@ function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (Objec
         let vi = evalExprWithEnv(stmt.e1, env);
         let ve = evalExprWithEnv(stmt.e2, env);
 
-        let computedJS : (Object | undefined)[] = [];
+        let results : (Object | undefined)[] = [];
         
         // perform loop
         const loopEnv = new Map(env);
         while(vi < ve) {
             loopEnv.set(stmt.var.name, vi++);
             stmt.body.forEach(s => {
-                computedJS = computedJS.concat(evalStmt(s, new Map(loopEnv), state));
+                results = results.concat(evalStmt(s, new Map(loopEnv), state));
             });
         }
 
-        return computedJS;
+        return results;
 
     } else if (isColor(stmt)) {
         // apply color to stroke

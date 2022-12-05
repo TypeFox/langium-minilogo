@@ -3,3 +3,4 @@ out/
 examples/generated
 .DS_Store
 *.vsix
+public/

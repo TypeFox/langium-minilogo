@@ -30,27 +30,29 @@ npm run build
 npm run build:web
 ```
 
-This setups up the libraries that you will need in **examples/generated/libs** for all examples.
-
-To build the examples included, you can run these two commands below -- one for each example.
+This setups up the libraries that you will need in **public** for all MiniLogo programs. You can startup an simple express app on localhost:3000 with a default program by running the following.
 
 ```bash
-npm run generate:test
-npm run generate:logo
-```
-
-This will create **examples/generated/test** and **examples/generated/langium**. Each of these folders contains a single index.html that includes the minilogo web worker (from libs) to get the language server running. They also include their respective **mini-logo.js** file to prepare the canvas for drawing, and sketch up the preliminary image.
-
-To make it easy to access these files, you can use the built-in express server to access these static assets.
-
-```
 npm run serve
 ```
 
-This will listen on localhost:3000 by default, and makes it easy to view both the test and langium minilogo applications.
+In the same interface you can also add in any MiniLogo program (that is recognized by this implementation of MiniLogo in Langium) that you would like to test, and see the results printed to the canvas on the right hand side. Once changes are made, you can click the update button at the bottom of the page to trigger redrawing the canvas using the current program.
 
-Each one runs an instance of Langium & Monaco. This makes it easy to change your program on the fly, trigger an update via the 'Update Canvas' button, and then view your results drawn in realtime.
+There are some example MiniLogo programs in the **examples** folder that you can try out as well.
 
+At a high-level, updating the canvas works by:
+
+- Monaco executes a custom LSP command, passing the current program
+- the language server (Langium) receives this LSP command through a registered command handler
+- the generator API is invoked using the provided program
+- generator invokes the parser on provided program
+- an AST is produced, validations are performed, etc.
+- the generator traverses and transforms this AST into an array of drawing commands (includes evaluation of exprs)
+- these drawing commands are returned as the result of executing the LSP command
+- the front-end proceses these drawing instructions using a very simple stack-based machine
+- the machine drives visual updates to the canvas
+
+This is a hyper generalization of each step, but the deatils can be explored by checking out [Langium's tutorials](https://langium.org/tutorials/).
 
 ## Running Locally
 

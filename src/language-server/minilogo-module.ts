@@ -1,7 +1,9 @@
 import {
-    createDefaultModule, createDefaultSharedModule, DefaultSharedModuleContext, inject,
+    AbstractExecuteCommandHandler,
+    createDefaultModule, createDefaultSharedModule, DefaultSharedModuleContext, ExecuteCommandAcceptor, inject,
     LangiumServices, LangiumSharedServices, Module, PartialLangiumServices
 } from 'langium';
+import { parseAndGenerate } from '../web';
 import { MiniLogoGeneratedModule, MiniLogoGeneratedSharedModule } from './generated/module';
 import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-validator';
 
@@ -29,8 +31,17 @@ export const MiniLogoModule: Module<MiniLogoServices, PartialLangiumServices & M
     validation: {
         ValidationRegistry: (services) => new MiniLogoValidationRegistry(services),
         MiniLogoValidator: () => new MiniLogoValidator()
-    }
+    },
 };
+
+class MiniLogoCommandHandler extends AbstractExecuteCommandHandler {
+    registerCommands(acceptor: ExecuteCommandAcceptor): void {
+        acceptor('parseAndGenerate', args => {
+            // invoke generator on this data, and return response
+            return parseAndGenerate(args[0]);
+        });
+    }
+}
 
 /**
  * Create the full set of services required by Langium.
@@ -60,6 +71,7 @@ export function createMiniLogoServices(context: DefaultSharedModuleContext): {
         MiniLogoGeneratedModule,
         MiniLogoModule
     );
+    shared.lsp.ExecuteCommandHandler = new MiniLogoCommandHandler();
     shared.ServiceRegistry.register(MiniLogo);
     return { shared, MiniLogo };
 }
