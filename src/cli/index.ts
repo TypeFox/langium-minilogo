@@ -26,7 +26,7 @@ export const generateAction = async (fileName: string, opts: GenerateOptions): P
 
     // read mini-logo, and add generated JS to it
     const fileContents = fs.readFileSync(fileName).toString('utf-8').replaceAll(/`/g, '\\`');
-    const baseJsContent = fs.readFileSync('./src/static/mini-logo.js');
+    const baseJsContent = fs.readFileSync('./src/static/setup.js');
     const programText = `\n\nconst LOGO_PROGRAM_TEXT = \`${fileContents}\`;`;
 
     fs.writeFileSync(generatedFileJSPath, baseJsContent + '\n\n' + generatedJS + '\n\n' + programText);
