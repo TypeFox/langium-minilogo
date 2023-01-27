@@ -46,7 +46,7 @@
     },
     "main": "./out/extension.js",
     "scripts": {
-        "vscode:prepublish": "npm run build:extension && npm run lint",
+        "vscode:prepublish": "npm run langium:generate && npm run build:extension && npm run lint",
         "build:extension": "npm run esbuild:extension && npm run esbuild:ls",
         "esbuild:extension": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
         "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.js --format=cjs --platform=node",
