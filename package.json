@@ -52,7 +52,7 @@
         "lint": "eslint src --ext ts",
 
         "build": "tsc -b tsconfig.json",
-        "build:worker": "esbuild --minify ./out/language-server/main-browser.js --bundle --format=iife --outfile=./out/libs/minilogo-server-worker.js",
+        "build:worker": "esbuild --minify ./out/language-server/main-browser.js --bundle --format=iife --outfile=./public/minilogo-server-worker.js",
         "prepare:public": "npx shx mkdir -p ./public; npx shx cp -fr ./src/static/* ./public/",
         "copy:monaco-editor-wrapper": "npx shx cp -fr ./node_modules/monaco-editor-wrapper/bundle ./public/monaco-editor-wrapper",
         "copy:monaco-workers": "npx shx cp -fr ./node_modules/monaco-editor-workers/dist/ ./public/monaco-editor-workers",
