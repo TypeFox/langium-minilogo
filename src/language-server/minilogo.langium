@@ -36,15 +36,15 @@ Mult infers Expr:
 
 PrimExpr: Lit | Ref | Group | NegExpr;
 
-Lit:        val=INT;
+Lit:        val=NUMBER;
 Ref:        val=[Param:ID];
 Group:      '(' ge=Expr ')';
 NegExpr:    '-' ne=Expr;
 
 // Terminals
-terminal HEX returns string:    /#(\d|[a-fA-F])+/;
+terminal HEX returns string:    /#(\d|[a-fA-F]){3,6}/;
 terminal ID returns string:     /[_a-zA-Z][\w_]*/;
-terminal INT returns number:    /-?[0-9]+/;
+terminal NUMBER returns number:    /(?:(?:-?[0-9]+)?\.[0-9]+)|-?[0-9]+/;
 hidden terminal WS:             /\s+/;
 hidden terminal ML_COMMENT:     /\/\*[\s\S]*?\*\//;
 hidden terminal SL_COMMENT:     /\/\/[^\n\r]*/;

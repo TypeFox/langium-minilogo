@@ -10,9 +10,9 @@ export default {
 
     tokenizer: {
         initial: [
-            { regex: /#(\d|[a-fA-F])+/, action: {"token":"string"} },
+            { regex: /#(\d|[a-fA-F]){3,6}/, action: {"token":"string"} },
             { regex: /[_a-zA-Z][\w_]*/, action: { cases: { '@keywords': {"token":"keyword"}, '@default': {"token":"string"} }} },
-            { regex: /-?[0-9]+/, action: {"token":"number"} },
+            { regex: /(?:(?:-?[0-9]+)?\.[0-9]+)|-?[0-9]+/, action: {"token":"number"} },
             { include: '@whitespace' },
             { regex: /@symbols/, action: { cases: { '@operators': {"token":"operator"}, '@default': {"token":""} }} },
         ],

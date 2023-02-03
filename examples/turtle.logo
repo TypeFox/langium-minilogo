@@ -47,10 +47,10 @@ def drawShell() {
 
 // Draws a turtle leg, using a given x & y to allow rotating & flipping
 def drawLeg(x,y) {
-    move(x / 2, y / 2)
-    move(x, -y / 2)
-    move(-x / 2, -y / 2)
-    move(-x, y / 2)
+    move(x * 0.5, y * 0.5)
+    move(x, -y * 0.5)
+    move(-x * 0.5, -y * 0.5)
+    move(-x, y * 0.5)
 }
 
 // Draws the turtle's legs

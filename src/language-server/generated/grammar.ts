@@ -836,7 +836,7 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ?? (loadedMi
         "terminal": {
           "$type": "RuleCall",
           "rule": {
-            "$refText": "INT"
+            "$refText": "NUMBER"
           },
           "arguments": []
         }
@@ -952,7 +952,7 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ?? (loadedMi
       },
       "definition": {
         "$type": "RegexToken",
-        "regex": "#(\\\\d|[a-fA-F])+"
+        "regex": "#(\\\\d|[a-fA-F]){3,6}"
       },
       "fragment": false,
       "hidden": false
@@ -973,14 +973,14 @@ export const MiniLogoGrammar = (): Grammar => loadedMiniLogoGrammar ?? (loadedMi
     },
     {
       "$type": "TerminalRule",
-      "name": "INT",
+      "name": "NUMBER",
       "type": {
         "$type": "ReturnType",
         "name": "number"
       },
       "definition": {
         "$type": "RegexToken",
-        "regex": "-?[0-9]+"
+        "regex": "(?:(?:-?[0-9]+)?\\\\.[0-9]+)|-?[0-9]+"
       },
       "fragment": false,
       "hidden": false
