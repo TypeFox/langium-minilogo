@@ -1,10 +1,9 @@
-import { MonacoEditorLanguageClientWrapper } from './monaco-editor-wrapper/index.js';
+import { MonacoEditorLanguageClientWrapper, vscode } from './monaco-editor-wrapper/index.js';
 import { buildWorkerDefinition } from "./monaco-editor-workers/index.js";
 
 buildWorkerDefinition('./monaco-editor-workers/workers', new URL('', window.location.href).href, false);
 
 MonacoEditorLanguageClientWrapper.addMonacoStyles('monaco-editor-styles');
-MonacoEditorLanguageClientWrapper.addCodiconTtf();
 
 const client = new MonacoEditorLanguageClientWrapper('42');
 const editorConfig = client.getEditorConfig();
@@ -76,8 +75,6 @@ window.addEventListener("resize", () => client.updateLayout());
 const generateAndDisplay = (async () => {
     console.info('generating & running current code...');
     const value = client.editor.getValue();
-    // parse & generate new command stack for drawing a new image
-    const vscode = client.getVscode();
     // execute custom command, and receive the response
     const minilogoCmds = await vscode.commands.executeCommand('parseAndGenerate', value);
     updateMiniLogoCanvas(minilogoCmds);
