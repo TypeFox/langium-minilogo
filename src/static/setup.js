@@ -1,4 +1,4 @@
-import { MonacoEditorLanguageClientWrapper, vscode } from './monaco-editor-wrapper/index.js';
+import { MonacoEditorLanguageClientWrapper, vscode } from './monaco-editor-wrapper/bundle/index.js';
 import { buildWorkerDefinition } from "./monaco-editor-workers/index.js";
 
 buildWorkerDefinition('./monaco-editor-workers/workers', new URL('', window.location.href).href, false);

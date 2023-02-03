@@ -82,4 +82,8 @@ For a more advanced example, you can generate a program that will draw an approx
 $ npm run generate:logo
 ```
 
-Note that both of these examples are generated statically from the CLI, and are capable of being used as standalone web-apps for writing MiniLogo programs. For this, please see the **Running in the Web** section above.
+For fun, there's also a turtle example too.
+
+<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m3.gif" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
+
+Note that these examples are generated statically from the CLI, and are capable of being used as standalone web-apps for writing MiniLogo programs. For this, please see the **Running in the Web** section above.
