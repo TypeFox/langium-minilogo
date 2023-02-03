@@ -4,7 +4,7 @@
     "icon": "icon.png",
     "publisher": "TypeFox",
     "description": "An implementation of the MiniLogo Language in Langium",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "engines": {
         "vscode": "^1.56.0"
     },
