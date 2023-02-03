@@ -20,9 +20,9 @@ editorConfig.setMonarchTokensProvider({
 
     tokenizer: {
         initial: [
-            { regex: /#(\d|[a-fA-F])+/, action: {"token":"string"} },
+            { regex: /#(\d|[a-fA-F]){3,6}/, action: {"token":"string"} },
             { regex: /[_a-zA-Z][\w_]*/, action: { cases: { '@keywords': {"token":"keyword"}, '@default': {"token":"string"} }} },
-            { regex: /-?[0-9]+/, action: {"token":"number"} },
+            { regex: /(?:(?:-?[0-9]+)?\.[0-9]+)|-?[0-9]+/, action: {"token":"number"} },
             { include: '@whitespace' },
             { regex: /@symbols/, action: { cases: { '@operators': {"token":"operator"}, '@default': {"token":""} }} },
         ],
@@ -43,7 +43,7 @@ editorConfig.theme = 'vs-dark';
 editorConfig.useLanguageClient = true;
 editorConfig.useWebSocket = false;
 
-editorConfig.setMainCode(`
+let mainCode = `
 def test() {
     move(100, 0)
     pen(down)
@@ -56,10 +56,19 @@ def test() {
 color(white)
 test()
 
-`);
+`;
+
+// seek to restore previous code from our last session
+if (window.localStorage) {
+    const storedCode = window.localStorage.getItem('mainCode');
+    if (storedCode !== null) {
+        mainCode = storedCode;
+    }
+}
+
+editorConfig.setMainCode(mainCode);
 
 const workerURL = new URL('./minilogo-server-worker.js', import.meta.url);
-console.log(workerURL.href);
 
 const lsWorker = new Worker(workerURL.href, {
     type: 'classic',
@@ -72,12 +81,32 @@ const startingPromise = client.startEditor(document.getElementById("monaco-edito
 
 window.addEventListener("resize", () => client.updateLayout());
 
-const generateAndDisplay = (async () => {
+// Set a status message to display below the update button
+function setStatus(msg) {
+    document.getElementById('status-msg').innerHTML = msg;
+}
+
+let running = false;
+const generateAndDisplay = (() => {
+    if (running) {
+        console.info('blocked...');
+        return;
+    }
+    running = true;
+    setStatus('');
     console.info('generating & running current code...');
     const value = client.editor.getValue();
+    if (window.localStorage) {
+        window.localStorage.setItem('mainCode', value);
+    }
     // execute custom command, and receive the response
-    const minilogoCmds = await vscode.commands.executeCommand('parseAndGenerate', value);
-    updateMiniLogoCanvas(minilogoCmds);
+    vscode.commands.executeCommand('parseAndGenerate', value).then((minilogoCmds) => {
+        return updateMiniLogoCanvas(minilogoCmds);
+    }).catch((e) => {
+        setStatus(e);
+    }).finally(() => {
+        running = false;
+    });
 });
 
 // Updates the mini-logo canvas
@@ -109,18 +138,21 @@ function updateMiniLogoCanvas(cmds) {
     let posX = 0;
     let posY = 0;
 
-    // use the command list to execute each commmand with a small delay
-    const id = setInterval(() => {
-        if (cmds.length > 0) {
-            dispatchCommand(cmds.shift(), context);
-        } else {
-            // finish existing draw
-            if (drawing) {
-                context.stroke();
+    const doneDrawingPromise = new Promise((resolve) => {
+        // use the command list to execute each command with a small delay
+        const id = setInterval(() => {
+            if (cmds.length > 0) {
+                dispatchCommand(cmds.shift(), context);
+            } else {
+                // finish existing draw
+                if (drawing) {
+                    context.stroke();
+                }
+                clearInterval(id);
+                resolve();
             }
-            clearInterval(id);
-        }
-    }, 1);
+        }, 1);
+    });
 
     // dispatches a single command in the current context
     function dispatchCommand(cmd, context) {
@@ -169,6 +201,7 @@ function updateMiniLogoCanvas(cmds) {
             }
         }
     }
+    return doneDrawingPromise;
 }
 
 startingPromise.then(() => {

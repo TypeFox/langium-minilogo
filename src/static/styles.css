@@ -82,3 +82,7 @@ footer {
 #monaco-editor-root {
     flex-grow: 1;
 }
+
+#status-msg {
+    color: red;
+}
