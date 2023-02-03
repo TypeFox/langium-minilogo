@@ -1,4 +1,4 @@
-import { MonacoEditorLanguageClientWrapper, vscode } from './monaco-editor-wrapper/bundle/index.js';
+import { MonacoEditorLanguageClientWrapper, vscode } from './monaco-editor-wrapper/index.js';
 import { buildWorkerDefinition } from "./monaco-editor-workers/index.js";
 
 buildWorkerDefinition('./monaco-editor-workers/workers', new URL('', window.location.href).href, false);
@@ -58,7 +58,7 @@ test()
 
 `;
 
-// seek to restore previous code from our last session
+// seek to restore any previous code from our last session
 if (window.localStorage) {
     const storedCode = window.localStorage.getItem('mainCode');
     if (storedCode !== null) {
@@ -72,14 +72,12 @@ const workerURL = new URL('./minilogo-server-worker.js', import.meta.url);
 
 const lsWorker = new Worker(workerURL.href, {
     type: 'classic',
-    name: 'LS'
+    name: 'MiniLogoLS'
 });
 client.setWorker(lsWorker);
 
 // keep a reference to a promise for when the editor is finished starting, we'll use this to setup the canvas on load
 const startingPromise = client.startEditor(document.getElementById("monaco-editor-root"));
-
-window.addEventListener("resize", () => client.updateLayout());
 
 // Set a status message to display below the update button
 function setStatus(msg) {
@@ -89,7 +87,6 @@ function setStatus(msg) {
 let running = false;
 const generateAndDisplay = (() => {
     if (running) {
-        console.info('blocked...');
         return;
     }
     running = true;
@@ -105,6 +102,7 @@ const generateAndDisplay = (() => {
     }).catch((e) => {
         setStatus(e);
     }).finally(() => {
+        console.info('done...');
         running = false;
     });
 });
