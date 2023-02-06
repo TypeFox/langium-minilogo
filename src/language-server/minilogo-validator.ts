@@ -5,7 +5,7 @@ import type { MiniLogoServices } from './minilogo-module';
 /**
  * Map AST node types to validation checks.
  */
-type MiniLogoChecks = { [type in (keyof MiniLogoAstType)]?: ValidationCheck | ValidationCheck[] }
+type MiniLogoChecks = ValidationChecks<MiniLogoAstType>
 
 /**
  * Registry for validation checks.
