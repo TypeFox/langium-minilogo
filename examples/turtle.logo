@@ -1,0 +1,96 @@
+/*
+turtle.logo
+
+Draws a turtle!
+*/
+
+// Draw the head with a given dimension, and option to flip along the y
+def drawHead(dimen, yFlip) {
+    move(dimen / 2, 0)
+    move(0, -dimen * yFlip)
+    move(-dimen/2, -dimen/2 * yFlip)
+    move(-dimen/2, dimen/2 * yFlip)
+    move(0, dimen * yFlip)
+    move(dimen / 2, 0)
+}
+
+// Draw a shell shape as an octagon
+def drawShellShape(dimen) {
+    move(dimen / 2,0)
+    move(dimen, dimen)
+    move(0, dimen)
+    move(-dimen, dimen)
+    move(-dimen, 0)
+    move(-dimen, -dimen)
+    move(0, -dimen)
+    move(dimen, -dimen)
+    move(dimen / 2, 0)
+}
+
+// Helper function to move without painting
+def moveNoDraw(x,y) {
+    pen(up)
+    move(x,y)
+    pen(down)
+}
+
+// Draws the total turtle shell with a series of smaller ones
+def drawShell() {
+    for x = 1 to 6 {
+        color(0, 255 / x, x * (255 / 5))
+        drawShellShape(5 * x)
+        moveNoDraw(0,-7)
+    }
+    color(128, 255, 128)
+    drawShellShape(30)
+}
+
+// Draws a turtle leg, using a given x & y to allow rotating & flipping
+def drawLeg(x,y) {
+    move(x * 0.5, y * 0.5)
+    move(x, -y * 0.5)
+    move(-x * 0.5, -y * 0.5)
+    move(-x, y * 0.5)
+}
+
+// Draws the turtle's legs
+def drawLegs() {
+    // top right
+    moveNoDraw(25,10)
+    drawLeg(25,25)
+
+    // top left
+    moveNoDraw(-50,0)
+    drawLeg(-25,25)
+
+    // bottom left
+    moveNoDraw(0,70)
+    drawLeg(-25,-25)
+
+    // bottom right
+    moveNoDraw(50,0)
+    drawLeg(25,-25)
+}
+
+// Draws the tail as a smaller, inverted head
+def drawTail() {
+    moveNoDraw(-25,10)
+    drawHead(10,-1)
+}
+
+// Set starting pen position & color
+def setup() {
+    // program starts w/ pen UP and 0,0 position
+    // start off at 0,0
+    move(250,250)
+    pen(down)
+    color(green)   
+}
+
+setup()
+
+// draw the turtle!
+drawShell()
+drawHead(20,1)
+drawLegs()
+drawTail()

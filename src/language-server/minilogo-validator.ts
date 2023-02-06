@@ -1,11 +1,11 @@
-import { ValidationAcceptor, ValidationCheck, ValidationRegistry } from 'langium';
-import { Def, MiniLogoAstType, Model } from './generated/ast';
+import { AstNode, ValidationAcceptor, ValidationChecks, ValidationRegistry } from 'langium';
+import { isDef, isModel, MiniLogoAstType } from './generated/ast';
 import type { MiniLogoServices } from './minilogo-module';
 
 /**
  * Map AST node types to validation checks.
  */
-type MiniLogoChecks = { [type in MiniLogoAstType]?: ValidationCheck | ValidationCheck[] }
+type MiniLogoChecks = ValidationChecks<MiniLogoAstType>
 
 /**
  * Registry for validation checks.
@@ -26,7 +26,10 @@ export class MiniLogoValidationRegistry extends ValidationRegistry {
 
 export class MiniLogoValidator {
 
-    checkUniqueDefs(model: Model, accept: ValidationAcceptor): void {
+    checkUniqueDefs(model: AstNode, accept: ValidationAcceptor): void {
+        if (!isModel(model)) {
+            throw new Error('Retrieve a non-model in validation');
+        }
         const reported = new Set();
         model.defs.forEach(d => {
             if (reported.has(d.name)) {
@@ -36,7 +39,10 @@ export class MiniLogoValidator {
         });
     }
 
-    checkUniqueParams(def: Def, accept: ValidationAcceptor): void {
+    checkUniqueParams(def: AstNode, accept: ValidationAcceptor): void {
+        if (!isDef(def)) {
+            throw new Error('Retrieve a non-def in validation');
+        }
         const reported = new Set();
         def.params.forEach(p => {
             if (reported.has(p.name)) {

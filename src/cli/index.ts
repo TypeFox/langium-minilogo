@@ -8,7 +8,7 @@ import { createMiniLogoServices } from '../language-server/minilogo-module';
 import { extractAstNode, extractDestinationAndName } from './cli-util';
 import { generateMiniLogoCmds } from '../generator/generator';
 import path from 'path';
-import { CompositeGeneratorNode, NL, processGeneratorNode } from 'langium';
+import { CompositeGeneratorNode, NL, toString } from 'langium';
 
 export const generateAction = async (fileName: string, opts: GenerateOptions): Promise<void> => {
     const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
@@ -65,7 +65,7 @@ function getCmdStackString(model: Model): string {
         "];", NL,
     );
 
-    return processGeneratorNode(fileNodeJS);
+    return toString(fileNodeJS);
 }
 
 export type GenerateOptions = {
