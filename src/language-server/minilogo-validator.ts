@@ -1,4 +1,4 @@
-import { AstNode, ValidationAcceptor, ValidationCheck, ValidationRegistry } from 'langium';
+import { AstNode, ValidationAcceptor, ValidationChecks, ValidationRegistry } from 'langium';
 import { isDef, isModel, MiniLogoAstType } from './generated/ast';
 import type { MiniLogoServices } from './minilogo-module';
 
