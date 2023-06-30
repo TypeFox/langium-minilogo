@@ -8,16 +8,26 @@ export interface MoveArgs {
     y: number;
 }
 
+/**
+ * Either a hex value or RGB values can be provided, not both.
+ */
 export interface ColorArgs {
+    /** A hex value for a color */
     color?: string;
+    /** RGB values for a color */
     r?: number;
     g?: number;
     b?: number;
 }
 
+/**
+ * Converts generateMiniLogoCmds to an array of commands
+ * @param commands the output of generateMiniLogoCmds
+ * @returns an array of commands
+ */
 export function getCommands(commands: any[]): Command[] {
     let result: Command[] = [];
-    commands.map((command) => {
+    commands.forEach((command) => {
         switch (command.cmd) {
             case 'penUp':
                 result.push({ name: 'penUp', args: undefined } as Command);
