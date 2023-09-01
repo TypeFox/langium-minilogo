@@ -64,6 +64,11 @@ $ npm run langium:generate
 $ npm run build
 ```
 
+If you want to rebuild, it's always a good idea to run clean in-between to be sure you have an accurate build.
+```bash
+$ npm run clean
+```
+
 After this you can generate the resulting code from the given MiniLogo test program (or another if you wish). This implementation using Langium generates 2 files:
 - **index.html**, a simple HTML page with a canvas where the results are shown
 - **mini-logo.js**, a simple JS file where MiniLogo instructions are compiled into equivalent drawing commands for the canvas, along with some pre-written functions to assist in the process.
