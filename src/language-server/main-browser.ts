@@ -5,11 +5,11 @@
  ******************************************************************************/
 
 import { startLanguageServer, EmptyFileSystem, DocumentState } from 'langium';
-import { BrowserMessageReader, BrowserMessageWriter, Diagnostic, NotificationType, createConnection } from 'vscode-languageserver/browser';
-import { createMiniLogoServices } from './minilogo-module';
-import { Model } from './generated/ast';
-import { Command, getCommands } from './minilogo-actions';
-import { generateMiniLogoCmds } from '../generator/generator';
+import { BrowserMessageReader, BrowserMessageWriter, Diagnostic, NotificationType, createConnection } from 'vscode-languageserver/browser.js';
+import { createMiniLogoServices } from './minilogo-module.js';
+import { Model } from './generated/ast.js';
+import { Command, getCommands } from './minilogo-actions.js';
+import { generateMiniLogoCmds } from '../generator/generator.js';
 
 declare const self: DedicatedWorkerGlobalScope;
 

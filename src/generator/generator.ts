@@ -1,4 +1,4 @@
-import { isPen, isMove, isLit, isMacro, isGroup, Stmt, Model, Expr, isRef, isBinExpr, isFor, isColor, isNegExpr, Def } from '../language-server/generated/ast';
+import { isPen, isMove, isLit, isMacro, isGroup, Stmt, Model, Expr, isRef, isBinExpr, isFor, isColor, isNegExpr, Def } from '../language-server/generated/ast.js';
 
 // Map binds final values to names for references to function
 type MiniLogoGenEnv = Map<string,number>;

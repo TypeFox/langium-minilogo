@@ -1,6 +1,6 @@
-import { Model } from '../language-server/generated/ast';
-import { createMiniLogoServices } from '../language-server/minilogo-module';
-import { generateMiniLogoCmds } from '../generator/generator';
+import { Model } from '../language-server/generated/ast.js';
+import { createMiniLogoServices } from '../language-server/minilogo-module.js';
+import { generateMiniLogoCmds } from '../generator/generator.js';
 import { AstNode, EmptyFileSystem, LangiumServices } from 'langium';
 import { URI } from 'vscode-uri';
 
@@ -25,6 +25,6 @@ export async function parseAndGenerate (miniLogoProgram: string): Promise<Object
  */
 async function extractAstNodeFromString<T extends AstNode>(content: string, services: LangiumServices): Promise<T> {
     const doc = services.shared.workspace.LangiumDocumentFactory.fromString(content, URI.parse('memory://minilogo.document'));
-    await services.shared.workspace.DocumentBuilder.build([doc], { validationChecks: 'all' });
+    await services.shared.workspace.DocumentBuilder.build([doc], { validation: true });
     return doc.parseResult?.value as T;
 }

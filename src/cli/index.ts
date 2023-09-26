@@ -1,12 +1,12 @@
 import colors from 'colors';
 import fs from 'fs';
 import { Command } from 'commander';
-import { Model } from '../language-server/generated/ast';
-import { MiniLogoLanguageMetaData } from '../language-server/generated/module';
+import { Model } from '../language-server/generated/ast.js';
+import { MiniLogoLanguageMetaData } from '../language-server/generated/module.js';
 import { NodeFileSystem } from 'langium/node';
-import { createMiniLogoServices } from '../language-server/minilogo-module';
-import { extractAstNode, extractDestinationAndName } from './cli-util';
-import { generateMiniLogoCmds } from '../generator/generator';
+import { createMiniLogoServices } from '../language-server/minilogo-module.js';
+import { extractAstNode, extractDestinationAndName } from './cli-util.js';
+import { generateMiniLogoCmds } from '../generator/generator.js';
 import path from 'path';
 import { CompositeGeneratorNode, NL, toString } from 'langium';
 

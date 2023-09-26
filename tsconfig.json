@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES6",
-    "module": "commonjs",
+    "module": "Node16",
     "lib": ["ESNext","DOM","webworker"],
     "sourceMap": true,
     "outDir": "out",
     "strict": true,
     "noUnusedLocals": true,
     "noImplicitReturns": true,
-    "moduleResolution": "node",
+    "moduleResolution": "Node16",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true

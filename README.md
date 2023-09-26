@@ -21,7 +21,7 @@ Notably, there is *no branching* instruction present, as there are *no booleans*
 
 ## Running in the Web
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
+<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/images/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
 
 To run these examples standalone in the web, you need to first build the regular application, and then build & copy assets over for usage in browsers.
 
@@ -79,7 +79,7 @@ $ npm run generate:test
 
 The result is present in `examples/generated/test/index.html`, which you can open in your browser, and view the following.
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
+<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
 
 For a more advanced example, you can generate a program that will draw an approximation of the langium logo.
 
@@ -89,6 +89,6 @@ $ npm run generate:logo
 
 For fun, there's also a turtle example too.
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m3.gif" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
+<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/images/m3.gif" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
 
 Note that these examples are generated statically from the CLI, and are capable of being used as standalone web-apps for writing MiniLogo programs. For this, please see the **Running in the Web** section above.
