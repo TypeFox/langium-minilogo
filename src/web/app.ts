@@ -1,5 +1,5 @@
 /**
- * Simple app for serving generated examples
+ * Simple express app for serving generated examples locally
  */
 
 import express from 'express';

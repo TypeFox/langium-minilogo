@@ -46,7 +46,7 @@
         "syntaxes"
     ],
     "bin": {
-        "minilogo-cli": "./bin/cli"
+        "minilogo-cli": "./bin/cli.js"
     },
     "exports": "./out/extension.js",
     "scripts": {
@@ -58,16 +58,16 @@
         "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.js --format=cjs --platform=node",
         "build:web": "npm run build && npm run prepare:public && npm run build:worker && npm run copy:monaco-editor-wrapper && npm run copy:monaco-workers",
         "build": "tsc -b tsconfig.json",
-        "build:worker": "esbuild --minify ./out/language-server/main-browser.js --bundle --format=iife --outfile=./public/minilogo-server-worker.js",
+        "build:worker": "esbuild --minify ./out/src/language-server/main-browser.js --bundle --format=iife --outfile=./public/minilogo-server-worker.js",
         "prepare:public": "shx mkdir -p ./public && shx cp -fr ./src/static/* ./public/",
         "copy:monaco-editor-wrapper": "shx cp -fr ./node_modules/monaco-editor-wrapper/bundle ./public/monaco-editor-wrapper",
         "copy:monaco-workers": "shx cp -fr ./node_modules/monaco-editor-workers/dist/ ./public/monaco-editor-workers",
         "watch": "tsc -b tsconfig.json --watch",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
-        "generate:test": "./bin/cli generate ./examples/test.logo && shx cp -fr ./out/libs ./examples/generated",
-        "generate:logo": "./bin/cli generate ./examples/langium.logo && shx cp -fr ./out/libs ./examples/generated",
-        "serve": "node ./out/web/app.js"
+        "generate:test": "./bin/cli.js generate ./examples/simple.logo",
+        "generate:logo": "./bin/cli.js generate ./examples/langium.logo",
+        "serve": "node ./out/src/web/app.js"
     },
     "dependencies": {
         "colors": "^1.4.0",

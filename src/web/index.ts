@@ -2,7 +2,7 @@ import { Model } from '../language-server/generated/ast.js';
 import { createMiniLogoServices } from '../language-server/minilogo-module.js';
 import { generateMiniLogoCmds } from '../generator/generator.js';
 import { AstNode, EmptyFileSystem, LangiumServices } from 'langium';
-import { URI } from 'vscode-uri';
+import { URI } from 'langium';
 
 /**
  * Parses a MiniLogo program & generates output as a list of Objects

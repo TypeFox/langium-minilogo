@@ -14,7 +14,7 @@ type DrawingState = {
 
 /**
  * Generates simple drawing commands from a MiniLogo Model
- * @param model Model to generate commmands from
+ * @param model Model to generate commands from
  * @returns Generated commands that captures the program's drawing intent
  */
 export function generateMiniLogoCmds(model: Model): Object[] {

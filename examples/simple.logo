@@ -1,0 +1,8 @@
+// draw a square on the screen.
+move(200,200)
+pen(down)
+move(100,0)
+move(0,100)
+move(-100,0)
+move(0,-100)
+pen(up)

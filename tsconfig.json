@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES6",
     "module": "Node16",
+    "resolveJsonModule": true,
     "lib": ["ESNext","DOM","webworker"],
     "sourceMap": true,
     "outDir": "out",

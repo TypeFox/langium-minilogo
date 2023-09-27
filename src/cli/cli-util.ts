@@ -2,7 +2,7 @@ import colors from 'colors';
 import path from 'path';
 import fs from 'fs';
 import { AstNode, LangiumDocument, LangiumServices } from 'langium';
-import { URI } from 'vscode-uri';
+import { URI } from 'langium';
 
 export async function extractDocument(fileName: string, services: LangiumServices): Promise<LangiumDocument> {
     const extensions = services.LanguageMetaData.fileExtensions;
