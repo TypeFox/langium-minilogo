@@ -19,10 +19,12 @@ export default async function(): Promise<void> {
     const program = new Command();
 
     // dynamically import & get the version from package.json
-    const version = ((await import('../../package.json', { assert: { type: 'json' } })) as unknown as { version: string}).version;
+    const packageJson = await import('../../package.json', { assert: { type: 'json' } });
+    const version = (packageJson as unknown as { default: { version: string} }).default.version;
     program.version(version);
 
     const fileExtensions = MiniLogoLanguageMetaData.fileExtensions.join(', ');
+
     program
         .command('generate')
         .argument('<file>', `source file (possible file extensions: ${fileExtensions})`)

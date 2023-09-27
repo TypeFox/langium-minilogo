@@ -3,6 +3,7 @@
     "displayName": "MiniLogo",
     "icon": "icon.png",
     "type": "module",
+    "keywords": ["minilogo","langium","typefox","graphics"],
     "publisher": "TypeFox",
     "description": "An implementation of the MiniLogo Language in Langium",
     "version": "2.0.0",
@@ -49,6 +50,7 @@
         "minilogo-cli": "./bin/cli.js"
     },
     "exports": "./out/extension.js",
+    "main": "./out/extension.js",
     "scripts": {
         "lint": "eslint src --ext ts",
         "clean": "shx rm -rf ./public; shx rm -rf ./out",

@@ -1,5 +1,6 @@
 import { MonacoEditorLanguageClientWrapper, UserConfig } from "monaco-editor-wrapper/bundle";
 import { buildWorkerDefinition } from "monaco-editor-workers";
+import { addMonacoStyles } from 'monaco-editor-wrapper/styles';
 
 /**
  * Pen command (up or down)
@@ -79,8 +80,7 @@ export interface ClassicConfig {
     htmlElement: HTMLElement,
     languageId: string,
     worker: WorkerUrl | Worker,
-    readonly?: boolean // whether to make the editor readonly or not (by default is false)
-    monarchGrammar?: any; //monaco.languages.IMonarchLanguage;
+    monarchGrammar: any;
 }
 
 /**
@@ -96,7 +96,6 @@ export function createUserConfig(config: ClassicConfig): UserConfig {
     // setup urls for config & grammar
     const id = config.languageId;
     const languageConfigUrl = `/${id}-configuration.json`;
-    // const languageGrammarUrl = `/${id}-grammar.json`;
 
     // set extension contents
     extensionContents.set(languageConfigUrl, JSON.stringify(defaultLanguageConfig));
@@ -143,7 +142,7 @@ function setup() {
         new URL('', window.location.href).href,
         false
     );
-    // addMonacoStyles('monaco-editor-styles');
+    addMonacoStyles('monaco-editor-styles');
 }
 
 /**
@@ -238,36 +237,14 @@ async function main() {
     setup();
     
     // setup a new wrapper
-    const wrapper = new MonacoEditorLanguageClientWrapper();
-    
-    // const editorConfig = wrapper.getEditorConfig();
-    // editorConfig.setMainLanguageId('minilogo');
-    
-    const monarchGrammar = getMonarchGrammar();
-    // editorConfig.setMonarchTokensProvider(monarchGrammar);
-    
-    // editorConfig.theme = 'vs-dark';
-    // editorConfig.useLanguageClient = true;
-    // editorConfig.useWebSocket = false;
-    
-    const mainCode = getMainCode();
-    
-    // editorConfig.setMainCode(mainCode);
-    
-    // prepare the worker
-    const worker = getWorker();
-    
-    // wrapper.setWorker(worker);
-    
-    // const startingPromise = wrapper.startEditor(document.getElementById("monaco-editor-root"));
-    
     // keep a reference to a promise for when the editor is finished starting, we'll use this to setup the canvas on load
+    const wrapper = new MonacoEditorLanguageClientWrapper();
     await wrapper.start(createUserConfig({
         htmlElement: document.getElementById("monaco-editor-root")!,
         languageId: 'minilogo',
-        code: mainCode,
-        worker,
-        monarchGrammar
+        code: getMainCode(),
+        worker: getWorker(),
+        monarchGrammar: getMonarchGrammar()
     }));
 
     const client = wrapper.getLanguageClient();
@@ -278,6 +255,13 @@ async function main() {
     let running = false;
     let timeout: NodeJS.Timeout | null = null;
     client.onNotification('browser/DocumentChange', (resp) => {
+
+        // always store this new program in local storage
+        const value = wrapper.getModel()?.getValue();
+        if (window.localStorage && value) {
+            window.localStorage.setItem('mainCode', value);
+        }
+
         // block until we're finished with a given run
         if (running) {
             return;
@@ -293,12 +277,6 @@ async function main() {
             running = true;
             setStatus('');
             console.info('generating & running current code...');
-
-            // store current program in local storage
-            const value = wrapper.getModel()?.getValue();
-            if (window.localStorage && value) {
-                window.localStorage.setItem('mainCode', value);
-            }
 
             // decode & run commands
             let result = JSON.parse(resp.content);
