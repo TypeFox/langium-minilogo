@@ -19,6 +19,7 @@
   ],
   "exclude": [
      "out",
+     "public",
      "node_modules"
   ]
 }

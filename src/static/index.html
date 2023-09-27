@@ -4,6 +4,7 @@
         <meta charset='utf-8'>
         <!-- Page & Monaco styling -->
         <link href="styles.css" rel="stylesheet"/>
+        <link rel="stylesheet" href="/monaco-editor-wrapper/assets/style.css">
         <title>MiniLogo in Langium</title>
     </head>
     <body>
@@ -23,9 +24,8 @@
             </div>
         </div>
 
-        <!-- Add a button to update our canvas, will invoke a globally accessible function -->
+        <!-- Status message location -->
         <div style="text-align:center">
-            <input class="build" type="button" value="Update Canvas" onclick="window.generateAndDisplay()">
             <span id="status-msg"></span>
         </div>
 
@@ -36,6 +36,6 @@
             <img width="125" src="https://langium.org/assets/langium_logo_w_nib.svg" alt="Langium">
         </footer>
         <!-- Monaco Configuration -->
-        <script type="module" src="setup.js"></script>
+        <script type="module" src="minilogo.js"></script>
     </body>
 </html>
