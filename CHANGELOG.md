@@ -7,9 +7,10 @@
 - Updated to Langium 2.0.0
 - Updated monaco-editor-wrapper to the latest version (3.1.0), and the built-in example accordingly
 - Updated the built-in web-app to use the latest wrapper & langium versions, plus some freshening up
-- Reworked the CLI to directly output generated Minilogo drawing commands, so its output matches that of the document listener on the language server
+- Reworked the CLI to directly output either an AST or generated drawing commands as JSON, more closely matching the language server's output on document validation
 - Reworked the old generate:test script (and dropped generate:logo) to just output the CLI's generated drawing commands to the console
 - Changed the package.json to use explicit exports, for ESM compatibility
+- renamed cli.js to minilogo.js
 
 # 1.2.0
 
