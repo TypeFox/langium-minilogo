@@ -47,7 +47,7 @@
         "syntaxes"
     ],
     "bin": {
-        "minilogo-cli": "./bin/cli.js"
+        "minilogo-cli": "./bin/minilogo.js"
     },
     "exports": "./out/extension.js",
     "main": "./out/extension.js",
@@ -65,8 +65,8 @@
         "watch": "tsc -b tsconfig.json --watch",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
-        "generate:test": "./bin/cli.js generate ./examples/simple.logo",
-        "generate:logo": "./bin/cli.js generate ./examples/langium.logo",
+        "generate:test": "./bin/minilogo.js generate ./examples/simple.logo",
+        "generate:logo": "./bin/minilogo.js generate ./examples/langium.logo",
         "serve": "node ./out/src/web/app.js"
     },
     "dependencies": {

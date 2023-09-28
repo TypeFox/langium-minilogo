@@ -30,7 +30,7 @@
         {
             "name": "Generate Logo",
             "type": "node",
-            "program": "${workspaceFolder}/bin/cli.js",
+            "program": "${workspaceFolder}/bin/minilogo.js",
             "request": "launch",
             "args": [
                 "generate",
