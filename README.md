@@ -21,7 +21,7 @@ Notably, there is *no branching* instruction present, as there are *no booleans*
 
 ## Running in the Web
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/images/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
 
 To run these examples standalone in the web, you need to first build the regular application, and then build & copy assets over for usage in browsers.
 
@@ -60,19 +60,27 @@ This is a hyper generalization of each step, but should be sufficient to get a g
 
 Here are the results of a couple of example programs
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/images/m3.gif" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m3.jpg" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
 
 ## Running Locally
 
 You can also directly spit out generated code from the command line, if you'd like to run this locally, you can run a generation test like so.
 
 ```bash
+# generate commands from a simple program
 npm run generate:test
+```
 
-# or run & store the output into a file
-./bin/cli.js examples/simple.logo > examples/simple.json
+You can also use the cli more directly, and generate either an AST or commands in JSON, whichever is of more interest. The AST will allow you to process the program as data, and the commands are pre-processed to support a simple stack-based drawing machine (a version of which is implemented in this project for demonstration).
+
+```bash
+# generate an AST
+./bin/minilogo.js generate examples/simple.logo > examples/ast.json
+
+# generate commands
+./bin/minilogo.js generate-cmds examples/simple.logo > examples/ast.json
 ```
 
 This will give you a a JSON array of drawing commands generated from the **examples/simple.logo** program. You can also run this on any other MiniLogo program that you'd like to test, such as **examples/test.logo** and **examples/turtle.logo**.
