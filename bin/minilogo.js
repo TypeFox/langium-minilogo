@@ -1,3 +1,3 @@
 #!/usr/bin/env node
-import { default as main } from "../out/src/cli/index.js";
+import { default as main } from "../out/cli/index.js";
 main();

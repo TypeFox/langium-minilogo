@@ -2,6 +2,11 @@
 
 An example of implementing a simple DSL, MiniLogo, in Langium.
 
+The core artifacts of this project are:
+
+- A Langium implementation of a variant of the MiniLogo language.
+- A demo web application for showing how Langium can run in the web.
+
 MiniLogo is a example language for operating a 'pen' to draw on a surface. If you're familiar with python's [Turtle graphics](https://docs.python.org/3/library/turtle.html), it's similar to that.
 
 This implementation is based on [Eric Walkingshaw's grammar and semantics at OSU](https://web.engr.oregonstate.edu/~walkiner/teaching/cs381-wi21/minilogo.html).
@@ -19,7 +24,44 @@ There is, at this time, a single example in **examples/test.logo**. Which demons
 
 Notably, there is *no branching* instruction present, as there are *no booleans* present in this language.
 
+## Building && Running Locally
+
+The primary artifact of this project is producing a MiniLogo parser & associated generator. This is done by running the following.
+
+```bash
+# in case you changed the grammar
+npm run langium:generate
+
+# compile minilogo
+npm run build
+```
+
+You can then reference the produced MiniLogo parser to directly process MiniLogo programs in your own projects.
+
+If you just want to generate code from parsed MiniLogo programs, you can use the cli from the command line. You can test it like so.
+
+```bash
+# generate commands from a simple program
+npm run generate:test
+```
+
+You can also use the cli more directly to generate either an AST or commands in JSON, whichever is of more interest. The AST will allow you to process the program as data, and the commands are pre-processed to support a simple stack-based drawing machine (a version of which is implemented in this project for demonstration).
+
+```bash
+# generate an AST
+./bin/minilogo.js generate examples/simple.logo > examples/ast.json
+
+# generate commands
+./bin/minilogo.js generate-cmds examples/simple.logo > examples/ast.json
+```
+
+This will give you a a JSON array of drawing commands generated from the **examples/simple.logo** program. You can also run this on any other MiniLogo program that you'd like to test, such as **examples/test.logo** and **examples/turtle.logo**.
+
+This output can be fed into another program to process the corresponding drawing commands, without needing to interact with a Minilogo program directly.
+
 ## Running in the Web
+
+The secondary artifact of this project is a simple web application that demonstrates running Langium in the web, without a backend.
 
 <img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
 
@@ -63,26 +105,3 @@ Here are the results of a couple of example programs
 <img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
 
 <img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m3.jpg" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
-
-## Running Locally
-
-You can also directly spit out generated code from the command line, if you'd like to run this locally, you can run a generation test like so.
-
-```bash
-# generate commands from a simple program
-npm run generate:test
-```
-
-You can also use the cli more directly, and generate either an AST or commands in JSON, whichever is of more interest. The AST will allow you to process the program as data, and the commands are pre-processed to support a simple stack-based drawing machine (a version of which is implemented in this project for demonstration).
-
-```bash
-# generate an AST
-./bin/minilogo.js generate examples/simple.logo > examples/ast.json
-
-# generate commands
-./bin/minilogo.js generate-cmds examples/simple.logo > examples/ast.json
-```
-
-This will give you a a JSON array of drawing commands generated from the **examples/simple.logo** program. You can also run this on any other MiniLogo program that you'd like to test, such as **examples/test.logo** and **examples/turtle.logo**.
-
-This output can be fed into another program to process the corresponding drawing commands, without needing to interact with a Minilogo program directly.

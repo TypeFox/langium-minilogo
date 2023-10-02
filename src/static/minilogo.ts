@@ -41,35 +41,6 @@ type MiniLogoColor = {
  */
 type MiniLogoCommand = MiniLogoPen | MiniLogoMove | MiniLogoColor;
 
-/**
- * Default language configuration, common to most Langium DSLs
- */
-const defaultLanguageConfig = {
-    "comments": {
-        "lineComment": "//",
-        "blockComment": ["/*", "*/"]
-    },
-    "brackets": [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"]
-    ],
-    "autoClosingPairs": [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"],
-        ["\"", "\""],
-        ["'", "'"]
-    ],
-    "surroundingPairs": [
-        ["{", "}"],
-        ["[", "]"],
-        ["(", ")"],
-        ["\"", "\""],
-        ["'", "'"]
-    ]
-};
-
 export type WorkerUrl = string;
 
 /**
@@ -90,15 +61,8 @@ export interface ClassicConfig {
  * @returns A completed UserConfig
  */
 export function createUserConfig(config: ClassicConfig): UserConfig {
-    // setup extension contents
-    const extensionContents = new Map();
-
     // setup urls for config & grammar
     const id = config.languageId;
-    const languageConfigUrl = `/${id}-configuration.json`;
-
-    // set extension contents
-    extensionContents.set(languageConfigUrl, JSON.stringify(defaultLanguageConfig));
 
     // generate langium config
     return {

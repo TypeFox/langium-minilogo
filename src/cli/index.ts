@@ -5,8 +5,12 @@ import { NodeFileSystem } from 'langium/node';
 import { createMiniLogoServices } from '../language-server/minilogo-module.js';
 import { extractAstNode } from './cli-util.js';
 import { generateMiniLogoCmds } from '../generator/generator.js';
+import * as url from 'node:url';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-export const generateAst = async (fileName: string, opts: GenerateOptions): Promise<void> => {
+export const generateAst = async (fileName: string): Promise<void> => {
     const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
     const model = await extractAstNode<Model>(fileName, services);
     // serialize & output the model ast
@@ -14,23 +18,20 @@ export const generateAst = async (fileName: string, opts: GenerateOptions): Prom
     console.log(serializedAst);
 };
 
-export const generateCmds = async (fileName: string, opts: GenerateOptions): Promise<void> => {
+export const generateCmds = async (fileName: string): Promise<void> => {
     const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
     const model = await extractAstNode<Model>(fileName, services);
     // directly output these commands to the console
     console.log(JSON.stringify(generateMiniLogoCmds(model)));
 };
 
-export type GenerateOptions = {}
-
 export default async function(): Promise<void> {
     const program = new Command();
 
     // dynamically import & get the version from package.json
-    // TODO 
-    // const packageJson = await import('../../package.json', { assert: { type: 'json' } });
-    const version = '2.0.0';
-    // const version = (packageJson as unknown as { default: { version: string} }).default.version;
+    const packagePath = path.resolve(__dirname, '..', '..', 'package.json');
+    const packageContent = await fs.readFile(packagePath, 'utf-8');
+    const version = JSON.parse(packageContent).version;
     program.version(version);
 
     const fileExtensions = MiniLogoLanguageMetaData.fileExtensions.join(', ');

@@ -3,7 +3,7 @@
 # 2.0.0
 
 - Moved to ESM
-- Updated to TypeScript 5.1.6
+- Updated to TypeScript 5.2.2
 - Updated to Langium 2.0.0
 - Updated monaco-editor-wrapper to the latest version (3.1.0), and the built-in example accordingly
 - Updated the built-in web-app to use the latest wrapper & langium versions, plus some freshening up
