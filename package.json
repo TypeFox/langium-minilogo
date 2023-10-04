@@ -2,11 +2,14 @@
     "name": "langium-minilogo",
     "displayName": "MiniLogo",
     "icon": "icon.png",
+    "type": "module",
+    "keywords": ["minilogo","langium","typefox","graphics"],
     "publisher": "TypeFox",
     "description": "An implementation of the MiniLogo Language in Langium",
-    "version": "1.2.1",
+    "version": "2.0.0",
     "engines": {
-        "vscode": "^1.56.0"
+        "vscode": "^1.56.0",
+        "node": ">=16"
     },
     "categories": [
         "Programming Languages"
@@ -44,8 +47,9 @@
         "syntaxes"
     ],
     "bin": {
-        "minilogo-cli": "./bin/cli"
+        "minilogo-cli": "./bin/minilogo.js"
     },
+    "exports": "./out/extension.js",
     "main": "./out/extension.js",
     "scripts": {
         "lint": "eslint src --ext ts",
@@ -54,42 +58,38 @@
         "build:extension": "npm run esbuild:extension && npm run esbuild:ls",
         "esbuild:extension": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
         "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.js --format=cjs --platform=node",
-        "build:web": "npm run build && npm run prepare:public && npm run build:worker && npm run copy:monaco-editor-wrapper && npm run copy:monaco-workers",
+        "build:web": "npm run build && npm run prepare:public && npm run build:worker && node scripts/copy-monaco-assets.mjs",
         "build": "tsc -b tsconfig.json",
         "build:worker": "esbuild --minify ./out/language-server/main-browser.js --bundle --format=iife --outfile=./public/minilogo-server-worker.js",
-        "prepare:public": "shx mkdir -p ./public && shx cp -fr ./src/static/* ./public/",
-        "copy:monaco-editor-wrapper": "shx cp -fr ./node_modules/monaco-editor-wrapper/bundle ./public/monaco-editor-wrapper",
-        "copy:monaco-workers": "shx cp -fr ./node_modules/monaco-editor-workers/dist/ ./public/monaco-editor-workers",
+        "prepare:public": "node scripts/prepare-public.mjs",
         "watch": "tsc -b tsconfig.json --watch",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
-        "generate:test": "./bin/cli generate ./examples/test.logo && shx cp -fr ./out/libs ./examples/generated",
-        "generate:logo": "./bin/cli generate ./examples/langium.logo && shx cp -fr ./out/libs ./examples/generated",
+        "generate:test": "./bin/minilogo.js generate ./examples/simple.logo",
+        "generate:logo": "./bin/minilogo.js generate ./examples/langium.logo",
         "serve": "node ./out/web/app.js"
     },
     "dependencies": {
         "colors": "^1.4.0",
         "commander": "^8.0.0",
-        "express": "^4.18.2",
-        "langium": "~1.2.1",
+        "langium": "~2.0.2",
         "monaco-editor-comp": "~1.6.0",
         "vscode-languageclient": "~8.0.2",
         "vscode-languageserver": "~8.0.2"
     },
     "devDependencies": {
-        "@types/express": "^4.17.17",
         "@types/node": "~16.18.11",
         "@types/vscode": "^1.56.0",
         "@typescript-eslint/eslint-plugin": "^5.61.0",
         "@typescript-eslint/parser": "^5.61.0",
         "@vscode/vsce": "^2.21.0",
-        "esbuild": "^0.18.11",
+        "esbuild": "^0.18.20",
         "eslint": "^8.44.0",
-        "langium-cli": "~1.2.1",
-        "monaco-editor-workers": "0.34.2",
-        "monaco-editor-wrapper": "1.6.0",
+        "langium-cli": "~2.0.1",
+        "monaco-editor-workers": "0.39.0",
+        "monaco-editor-wrapper": "3.1.0",
         "shx": "^0.3.4",
-        "typescript": "^4.1.3"
+        "typescript": "~5.1.6"
     },
     "repository": {
         "type": "git",

@@ -1,6 +1,6 @@
 import { AstNode, ValidationAcceptor, ValidationChecks, ValidationRegistry } from 'langium';
-import { isDef, isModel, MiniLogoAstType } from './generated/ast';
-import type { MiniLogoServices } from './minilogo-module';
+import { isDef, isModel, MiniLogoAstType } from './generated/ast.js';
+import type { MiniLogoServices } from './minilogo-module.js';
 
 /**
  * Map AST node types to validation checks.

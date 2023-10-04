@@ -2,6 +2,11 @@
 
 An example of implementing a simple DSL, MiniLogo, in Langium.
 
+The core artifacts of this project are:
+
+- A Langium implementation of a variant of the MiniLogo language.
+- A demo web application for showing how Langium can run in the web.
+
 MiniLogo is a example language for operating a 'pen' to draw on a surface. If you're familiar with python's [Turtle graphics](https://docs.python.org/3/library/turtle.html), it's similar to that.
 
 This implementation is based on [Eric Walkingshaw's grammar and semantics at OSU](https://web.engr.oregonstate.edu/~walkiner/teaching/cs381-wi21/minilogo.html).
@@ -19,18 +24,58 @@ There is, at this time, a single example in **examples/test.logo**. Which demons
 
 Notably, there is *no branching* instruction present, as there are *no booleans* present in this language.
 
+## Building && Running Locally
+
+The primary artifact of this project is producing a MiniLogo parser & associated generator. This is done by running the following.
+
+```bash
+# in case you changed the grammar
+npm run langium:generate
+
+# compile minilogo
+npm run build
+```
+
+You can then reference the produced MiniLogo parser to directly process MiniLogo programs in your own projects.
+
+If you just want to generate code from parsed MiniLogo programs, you can use the cli from the command line. You can test it like so.
+
+```bash
+# generate commands from a simple program
+npm run generate:test
+```
+
+You can also use the cli more directly to generate either an AST or commands in JSON, whichever is of more interest. The AST will allow you to process the program as data, and the commands are pre-processed to support a simple stack-based drawing machine (a version of which is implemented in this project for demonstration).
+
+```bash
+# generate an AST
+./bin/minilogo.js generate examples/simple.logo > examples/ast.json
+
+# generate commands
+./bin/minilogo.js generate-cmds examples/simple.logo > examples/ast.json
+```
+
+This will give you a a JSON array of drawing commands generated from the **examples/simple.logo** program. You can also run this on any other MiniLogo program that you'd like to test, such as **examples/test.logo** and **examples/turtle.logo**.
+
+This output can be fed into another program to process the corresponding drawing commands, without needing to interact with a Minilogo program directly.
+
 ## Running in the Web
 
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
+The secondary artifact of this project is a simple web application that demonstrates running Langium in the web, without a backend.
+
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m2.jpg" width=800 alt="Image of Langium running standalone in the Browser">
 
 To run these examples standalone in the web, you need to first build the regular application, and then build & copy assets over for usage in browsers.
 
 ```bash
-npm run build
+# in case you've adjusted the grammar
+npm run langium:generate
+
+# compile minilogo, copy, and construct the appropriate web assets
 npm run build:web
 ```
 
-This setups up the libraries that you will need in **public** for all MiniLogo programs. You can startup an simple express app on localhost:3000 with a default program by running the following.
+This builds Minilogo, and sets up the libraries that you will need in **public** for all MiniLogo programs. You can startup an simple express app on localhost:3000 with a default program by running the following.
 
 ```bash
 npm run serve
@@ -38,57 +83,25 @@ npm run serve
 
 In the same interface you can also add in any MiniLogo program (that is recognized by this implementation of MiniLogo in Langium) that you would like to test, and see the results printed to the canvas on the right hand side. Once changes are made, you can click the update button at the bottom of the page to trigger redrawing the canvas using the current program.
 
+If you're running after making a large quantity of changes, you can always run `npm run clean` before building to ensure you have a stable state.
+
 There are some example MiniLogo programs in the **examples** folder that you can try out as well.
 
 At a high-level, updating the canvas works by:
 
-- Monaco executes a custom LSP command, passing the current program
-- the language server (Langium) receives this LSP command through a registered command handler
-- the generator API is invoked using the provided program
-- generator invokes the parser on provided program
-- an AST is produced, validations are performed, etc.
-- the generator traverses and transforms this AST into an array of drawing commands (includes evaluation of exprs)
-- these drawing commands are returned as the result of executing the LSP command
-- the front-end proceses these drawing instructions using a very simple stack-based machine
+- Monaco is started with a language client (LC), and is connected to an Minilogo language server (LS)
+- The document is updated, and the LC passes this new document (program) to the LS
+- the language server (Langium) receives the document
+- the document is parsed & an AST is produced, validations are performed, etc.
+- the generator is invoked to traverse and transform this AST into an array of drawing commands (includes evaluation of exprs)
+- these resulting commands, along with the AST, are returned as the result as a response to a successfully validated (processed) document
+- the front-end receives & processes these drawing instructions using a very simple stack-based machine
 - the machine drives visual updates to the canvas
 
 This is a hyper generalization of each step, but should be sufficient to get a good idea of how this example implementation works.
 
-## Running Locally
+Here are the results of a couple of example programs
 
-To run this simple language, you can first build up the grammar
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
 
-To run the language you can first generate from the langium grammar, and build the project:
-```bash
-$ npm run langium:generate
-$ npm run build
-```
-
-If you want to rebuild, it's always a good idea to run clean in-between to be sure you have an accurate build.
-```bash
-$ npm run clean
-```
-
-After this you can generate the resulting code from the given MiniLogo test program (or another if you wish). This implementation using Langium generates 2 files:
-- **index.html**, a simple HTML page with a canvas where the results are shown
-- **mini-logo.js**, a simple JS file where MiniLogo instructions are compiled into equivalent drawing commands for the canvas, along with some pre-written functions to assist in the process.
-
-```bash
-$ npm run generate:test
-```
-
-The result is present in `examples/generated/test/index.html`, which you can open in your browser, and view the following.
-
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
-
-For a more advanced example, you can generate a program that will draw an approximation of the langium logo.
-
-```bash
-$ npm run generate:logo
-```
-
-For fun, there's also a turtle example too.
-
-<img src="https://raw.githubusercontent.com/montymxb/minilogo-langium-example/main/m3.gif" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
-
-Note that these examples are generated statically from the CLI, and are capable of being used as standalone web-apps for writing MiniLogo programs. For this, please see the **Running in the Web** section above.
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m3.jpg" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">

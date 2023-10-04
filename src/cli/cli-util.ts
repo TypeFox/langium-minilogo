@@ -2,7 +2,7 @@ import colors from 'colors';
 import path from 'path';
 import fs from 'fs';
 import { AstNode, LangiumDocument, LangiumServices } from 'langium';
-import { URI } from 'vscode-uri';
+import { URI } from 'langium';
 
 export async function extractDocument(fileName: string, services: LangiumServices): Promise<LangiumDocument> {
     const extensions = services.LanguageMetaData.fileExtensions;
@@ -17,7 +17,7 @@ export async function extractDocument(fileName: string, services: LangiumService
     }
 
     const document = services.shared.workspace.LangiumDocuments.getOrCreateDocument(URI.file(path.resolve(fileName)));
-    await services.shared.workspace.DocumentBuilder.build([document], { validationChecks: 'all' });
+    await services.shared.workspace.DocumentBuilder.build([document], { validation: true });
 
     const validationErrors = (document.diagnostics ?? []).filter(e => e.severity === 1);
     if (validationErrors.length > 0) {

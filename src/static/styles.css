@@ -21,7 +21,7 @@ h1 {
     max-width: 2000px;
     margin: 4px auto;
     padding: 4px;
-    min-height: 80vh;
+    min-height: 75vh;
     justify-content: center;
 }
 #page-wrapper .half {

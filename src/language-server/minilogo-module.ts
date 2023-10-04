@@ -3,9 +3,9 @@ import {
     createDefaultModule, createDefaultSharedModule, DefaultSharedModuleContext, ExecuteCommandAcceptor, inject,
     LangiumServices, LangiumSharedServices, Module, PartialLangiumServices
 } from 'langium';
-import { parseAndGenerate } from '../web';
-import { MiniLogoGeneratedModule, MiniLogoGeneratedSharedModule } from './generated/module';
-import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-validator';
+import { parseAndGenerate } from '../web/index.js';
+import { MiniLogoGeneratedModule, MiniLogoGeneratedSharedModule } from './generated/module.js';
+import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-validator.js';
 
 /**
  * Declaration of custom services - add your own service classes here.
