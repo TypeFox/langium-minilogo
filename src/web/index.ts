@@ -1,8 +1,9 @@
 import { Model } from '../language-server/generated/ast.js';
 import { createMiniLogoServices } from '../language-server/minilogo-module.js';
 import { generateMiniLogoCmds } from '../generator/generator.js';
-import { AstNode, EmptyFileSystem, LangiumServices } from 'langium';
+import { AstNode, EmptyFileSystem } from 'langium';
 import { URI } from 'langium';
+import { LangiumServices } from 'langium/lsp';
 
 /**
  * Parses a MiniLogo program & generates output as a list of Objects
