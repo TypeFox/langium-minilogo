@@ -54,15 +54,15 @@
     "bin": {
         "minilogo-cli": "./bin/minilogo.js"
     },
-    "exports": "./out/extension.js",
-    "main": "./out/extension.js",
+    "exports": "./out/extension.cjs",
+    "main": "./out/extension.cjs",
     "scripts": {
         "lint": "eslint src --ext ts",
         "clean": "shx rm -rf ./public; shx rm -rf ./out",
         "vscode:prepublish": "npm run langium:generate && npm run build:extension && npm run lint",
         "build:extension": "npm run esbuild:extension && npm run esbuild:ls",
-        "esbuild:extension": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-        "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.js --format=cjs --platform=node",
+        "esbuild:extension": "esbuild ./src/extension.ts --bundle --outfile=out/extension.cjs --external:vscode --format=cjs --platform=node",
+        "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.cjs --format=cjs --platform=node",
         "build:web": "npm run build && npm run prepare:public && npm run build:worker && node scripts/copy-monaco-assets.mjs",
         "build": "tsc -b tsconfig.json",
         "build:worker": "esbuild --minify ./out/language-server/main-browser.js --bundle --format=iife --outfile=./public/minilogo-server-worker.js",
