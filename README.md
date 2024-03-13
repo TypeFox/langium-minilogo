@@ -59,6 +59,18 @@ This will give you a a JSON array of drawing commands generated from the **examp
 
 This output can be fed into another program to process the corresponding drawing commands, without needing to interact with a Minilogo program directly.
 
+## Building && Running the VSCode extension
+
+In VSCode, open a terminal and run the following line.
+
+```bash
+npm run build:extension
+```
+
+Then, run the extension by hitting F5 (`File menu` -> `Run` -> `Start debugging`).
+Another VSCode instance will open, and you can open the **examples** folder to see the MiniLogo language in action.
+
+
 ## Running in the Web
 
 The secondary artifact of this project is a simple web application that demonstrates running Langium in the web, without a backend.
@@ -104,4 +116,4 @@ Here are the results of a couple of example programs
 
 <img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
 
-<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m3.jpg" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m3.gif" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
