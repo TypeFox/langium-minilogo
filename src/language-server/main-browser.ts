@@ -4,12 +4,13 @@
  * terms of the MIT License, which is available in the project root.
  ******************************************************************************/
 
-import { startLanguageServer, EmptyFileSystem, DocumentState } from 'langium';
+import { EmptyFileSystem, DocumentState } from 'langium';
 import { BrowserMessageReader, BrowserMessageWriter, Diagnostic, NotificationType, createConnection } from 'vscode-languageserver/browser.js';
 import { createMiniLogoServices } from './minilogo-module.js';
 import { Model } from './generated/ast.js';
 import { Command, getCommands } from './minilogo-actions.js';
 import { generateMiniLogoCmds } from '../generator/generator.js';
+import { startLanguageServer } from 'langium/lsp';
 
 declare const self: DedicatedWorkerGlobalScope;
 

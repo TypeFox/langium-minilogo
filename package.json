@@ -3,10 +3,15 @@
     "displayName": "MiniLogo",
     "icon": "icon.png",
     "type": "module",
-    "keywords": ["minilogo","langium","typefox","graphics"],
+    "keywords": [
+        "minilogo",
+        "langium",
+        "typefox",
+        "graphics"
+    ],
     "publisher": "TypeFox",
     "description": "An implementation of the MiniLogo Language in Langium",
-    "version": "2.0.0",
+    "version": "3.0.0",
     "engines": {
         "vscode": "^1.56.0",
         "node": ">=16"
@@ -49,15 +54,15 @@
     "bin": {
         "minilogo-cli": "./bin/minilogo.js"
     },
-    "exports": "./out/extension.js",
-    "main": "./out/extension.js",
+    "exports": "./out/extension.cjs",
+    "main": "./out/extension.cjs",
     "scripts": {
         "lint": "eslint src --ext ts",
         "clean": "shx rm -rf ./public; shx rm -rf ./out",
         "vscode:prepublish": "npm run langium:generate && npm run build:extension && npm run lint",
         "build:extension": "npm run esbuild:extension && npm run esbuild:ls",
-        "esbuild:extension": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-        "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.js --format=cjs --platform=node",
+        "esbuild:extension": "esbuild ./src/extension.ts --bundle --outfile=out/extension.cjs --external:vscode --format=cjs --platform=node",
+        "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.cjs --format=cjs --platform=node",
         "build:web": "npm run build && npm run prepare:public && npm run build:worker && node scripts/copy-monaco-assets.mjs",
         "build": "tsc -b tsconfig.json",
         "build:worker": "esbuild --minify ./out/language-server/main-browser.js --bundle --format=iife --outfile=./public/minilogo-server-worker.js",
@@ -72,10 +77,10 @@
     "dependencies": {
         "colors": "^1.4.0",
         "commander": "^8.0.0",
-        "langium": "~2.0.2",
+        "langium": "^3.0.0",
         "monaco-editor-comp": "~1.6.0",
-        "vscode-languageclient": "~8.0.2",
-        "vscode-languageserver": "~8.0.2"
+        "vscode-languageclient": "~9.0.1",
+        "vscode-languageserver": "~9.0.1"
     },
     "devDependencies": {
         "@types/node": "~16.18.11",
@@ -85,7 +90,7 @@
         "@vscode/vsce": "^2.21.0",
         "esbuild": "^0.18.20",
         "eslint": "^8.44.0",
-        "langium-cli": "~2.0.1",
+        "langium-cli": "^3.0.0",
         "monaco-editor-workers": "0.39.0",
         "monaco-editor-wrapper": "3.1.0",
         "shx": "^0.3.4",
