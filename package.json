@@ -52,7 +52,7 @@
         "syntaxes"
     ],
     "bin": {
-        "minilogo-cli": "./bin/minilogo.js"
+        "minilogo-cli": "bin/minilogo.js"
     },
     "exports": "./out/extension.cjs",
     "main": "./out/extension.cjs",
@@ -98,7 +98,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/langium/langium-minilogo"
+        "url": "git+https://github.com/langium/langium-minilogo.git"
     },
     "bugs": "https://github.com/langium/langium-minilogo/issues",
     "author": {
