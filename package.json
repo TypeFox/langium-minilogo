@@ -75,26 +75,31 @@
         "serve": "node ./out/web/app.js"
     },
     "dependencies": {
-        "colors": "^1.4.0",
-        "commander": "^8.0.0",
-        "langium": "^3.0.0",
-        "monaco-editor-comp": "~1.6.0",
+        "colors": "~1.4.0",
+        "commander": "~12.0.0",
+        "langium": "~3.0.0",
+        "monaco-editor-wrapper": "~4.0.1",
         "vscode-languageclient": "~9.0.1",
-        "vscode-languageserver": "~9.0.1"
+        "vscode-languageserver": "~9.0.1",
+        "vscode-languageserver-protocol": "~3.17.5",
+        "vscode-languageserver-types": "~3.17.5",
+        "vscode-jsonrpc": "~8.2.0"
     },
     "devDependencies": {
-        "@types/node": "~16.18.11",
-        "@types/vscode": "^1.56.0",
-        "@typescript-eslint/eslint-plugin": "^5.61.0",
-        "@typescript-eslint/parser": "^5.61.0",
-        "@vscode/vsce": "^2.21.0",
-        "esbuild": "^0.18.20",
-        "eslint": "^8.44.0",
-        "langium-cli": "^3.0.0",
-        "monaco-editor-workers": "0.39.0",
-        "monaco-editor-wrapper": "3.1.0",
-        "shx": "^0.3.4",
-        "typescript": "~5.1.6"
+        "@types/node": "~18.19.25",
+        "@types/vscode": "~1.87.0",
+        "@typescript-eslint/eslint-plugin": "~7.3.1",
+        "@typescript-eslint/parser": "~7.3.1",
+        "@vscode/vsce": "~2.21.0",
+        "esbuild": "~0.20.2",
+        "eslint": "~8.57.0",
+        "langium-cli": "~3.0.1",
+        "shx": "~0.3.4",
+        "typescript": "~5.4.3"
+    },
+    "volta": {
+      "node": "18.19.1",
+      "npm": "10.2.4"
     },
     "repository": {
         "type": "git",
