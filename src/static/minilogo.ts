@@ -1,6 +1,5 @@
 import { MonacoEditorLanguageClientWrapper, UserConfig } from "monaco-editor-wrapper/bundle";
-import { buildWorkerDefinition } from "monaco-editor-workers";
-import { addMonacoStyles } from 'monaco-editor-wrapper/styles';
+import { useWorkerFactory } from "monaco-editor-wrapper/workerFactory";
 
 /**
  * Pen command (up or down)
@@ -48,7 +47,6 @@ export type WorkerUrl = string;
  */
 export interface ClassicConfig {
     code: string,
-    htmlElement: HTMLElement,
     languageId: string,
     worker: WorkerUrl | Worker,
     monarchGrammar: any;
@@ -66,24 +64,16 @@ export function createUserConfig(config: ClassicConfig): UserConfig {
 
     // generate langium config
     return {
-        htmlElement: config.htmlElement,
         wrapperConfig: {
             editorAppConfig: {
                 $type: 'classic',
                 languageId: id,
                 useDiffEditor: false,
-                automaticLayout: true,
                 code: config.code,
                 theme: 'vs-dark',
                 languageDef: config.monarchGrammar
             },
             serviceConfig: {
-                enableModelService: true,
-                configureConfigurationService: {
-                    defaultWorkspaceUri: '/tmp/'
-                },
-                enableKeybindingsService: true,
-                enableLanguagesService: true,
                 debugLogging: false
             }
         },
@@ -101,12 +91,13 @@ export function createUserConfig(config: ClassicConfig): UserConfig {
  * Prepare to setup the wrapper, building the worker def & setting up styles
  */
 function setup() {
-    buildWorkerDefinition(
-        './monaco-editor-workers/workers',
-        new URL('', window.location.href).href,
-        false
-    );
-    addMonacoStyles('monaco-editor-styles');
+    const workerUrl = new URL('monaco-editor-wrapper/dist/workers/editorWorker-es.js', window.location.href).href;
+    useWorkerFactory({
+        ignoreMapping: true,
+        workerLoaders: {
+            editorWorkerService: () => new Worker(workerUrl, { type: 'module' })
+        }
+    });
 }
 
 /**
@@ -203,13 +194,13 @@ async function main() {
     // setup a new wrapper
     // keep a reference to a promise for when the editor is finished starting, we'll use this to setup the canvas on load
     const wrapper = new MonacoEditorLanguageClientWrapper();
-    await wrapper.start(createUserConfig({
-        htmlElement: document.getElementById("monaco-editor-root")!,
+    const userConfig = createUserConfig({
         languageId: 'minilogo',
         code: getMainCode(),
         worker: getWorker(),
         monarchGrammar: getMonarchGrammar()
-    }));
+    })
+    await wrapper.initAndStart(userConfig, document.getElementById("monaco-editor-root")!);
 
     const client = wrapper.getLanguageClient();
     if (!client) {

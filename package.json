@@ -11,7 +11,7 @@
     ],
     "publisher": "TypeFox",
     "description": "An implementation of the MiniLogo Language in Langium",
-    "version": "3.0.0",
+    "version": "3.0.1",
     "engines": {
         "vscode": "^1.56.0",
         "node": ">=16"
@@ -60,11 +60,12 @@
         "lint": "eslint src --ext ts",
         "clean": "shx rm -rf ./public; shx rm -rf ./out",
         "vscode:prepublish": "npm run langium:generate && npm run build:extension && npm run lint",
+        "build": "npm run clean && npm run build:web && npm run build:extension",
         "build:extension": "npm run esbuild:extension && npm run esbuild:ls",
         "esbuild:extension": "esbuild ./src/extension.ts --bundle --outfile=out/extension.cjs --external:vscode --format=cjs --platform=node",
         "esbuild:ls": "esbuild ./src/language-server/main.ts --bundle --outfile=out/language-server/main.cjs --format=cjs --platform=node",
-        "build:web": "npm run build && npm run prepare:public && npm run build:worker && node scripts/copy-monaco-assets.mjs",
-        "build": "tsc -b tsconfig.json",
+        "build:web": "npm run build:tsc && npm run prepare:public && npm run build:worker && node scripts/copy-monaco-assets.mjs",
+        "build:tsc": "tsc -b tsconfig.json",
         "build:worker": "esbuild --minify ./out/language-server/main-browser.js --bundle --format=iife --outfile=./public/minilogo-server-worker.js",
         "prepare:public": "node scripts/prepare-public.mjs",
         "watch": "tsc -b tsconfig.json --watch",
@@ -75,26 +76,31 @@
         "serve": "node ./out/web/app.js"
     },
     "dependencies": {
-        "colors": "^1.4.0",
-        "commander": "^8.0.0",
-        "langium": "^3.0.0",
-        "monaco-editor-comp": "~1.6.0",
+        "colors": "~1.4.0",
+        "commander": "~12.0.0",
+        "langium": "~3.0.0",
+        "monaco-editor-wrapper": "~4.0.1",
         "vscode-languageclient": "~9.0.1",
-        "vscode-languageserver": "~9.0.1"
+        "vscode-languageserver": "~9.0.1",
+        "vscode-languageserver-protocol": "~3.17.5",
+        "vscode-languageserver-types": "~3.17.5",
+        "vscode-jsonrpc": "~8.2.0"
     },
     "devDependencies": {
-        "@types/node": "~16.18.11",
-        "@types/vscode": "^1.56.0",
-        "@typescript-eslint/eslint-plugin": "^5.61.0",
-        "@typescript-eslint/parser": "^5.61.0",
-        "@vscode/vsce": "^2.21.0",
-        "esbuild": "^0.18.20",
-        "eslint": "^8.44.0",
-        "langium-cli": "^3.0.0",
-        "monaco-editor-workers": "0.39.0",
-        "monaco-editor-wrapper": "3.1.0",
-        "shx": "^0.3.4",
-        "typescript": "~5.1.6"
+        "@types/node": "~18.19.25",
+        "@types/vscode": "~1.87.0",
+        "@typescript-eslint/eslint-plugin": "~7.3.1",
+        "@typescript-eslint/parser": "~7.3.1",
+        "@vscode/vsce": "~2.21.0",
+        "esbuild": "~0.20.2",
+        "eslint": "~8.57.0",
+        "langium-cli": "~3.0.1",
+        "shx": "~0.3.4",
+        "typescript": "~5.4.3"
+    },
+    "volta": {
+      "node": "18.19.1",
+      "npm": "10.2.4"
     },
     "repository": {
         "type": "git",

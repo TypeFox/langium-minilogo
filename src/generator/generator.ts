@@ -121,7 +121,8 @@ function evalStmt(stmt: Stmt, env: MiniLogoGenEnv, state: DrawingState) : (Objec
         }
 
     } else {
-        throw new Error('Unrecognized Statement encountered: ' + (stmt as any)?.$type ?? 'Unknown Type');
+        const type = (stmt as any)?.$type ?? 'Unknown Type'
+        throw new Error(`Unrecognized Statement encountered: ${type}`);
     }
 }
 
