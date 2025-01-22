@@ -1,6 +1,6 @@
 import { Module, inject } from 'langium';
 import { LangiumServices, PartialLangiumServices, AbstractExecuteCommandHandler, ExecuteCommandAcceptor, DefaultSharedModuleContext, LangiumSharedServices, createDefaultSharedModule, createDefaultModule } from 'langium/lsp';
-import { parseAndGenerate } from '../web/index.js';
+import { parseAndGenerate } from '../web/main.js';
 import { MiniLogoGeneratedModule, MiniLogoGeneratedSharedModule } from './generated/module.js';
 import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-validator.js';
 
