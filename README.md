@@ -13,16 +13,17 @@ This implementation is based on [Eric Walkingshaw's grammar and semantics at OSU
 
 Which in turn, is based on the [Logo language](https://el.media.mit.edu/logo-foundation/what_is_logo/logo_programming.html) itself.
 
-There is, at this time, a single example in **examples/test.logo**. Which demonstrates the aspects of MiniLogo:
+There are several example programs in the 'examples' folder you can check out, such as **examples/test.logo**. Overall, these programs demonstrates the aspects of MiniLogo:
+
 - **Move** commands to change position of the pen
 - **Pen up/down** commands to change the drawing state
 - Basic arithmetic expressions of **literal ints**, **references**, and **binary expressions**. Parenthesized and negated expressions are allowed as well
 - Common arithmetic binary functions are in infix notation: **+**, **-**, **\*** and **/**
 - **For** loops allow a means to bind a single variable to an expr, with a second expression as an excluded upper bound, and a body of statements that are executed on each loop
 - **Macros** are definable, taking arguments upon calling that are bound to parameters which can be referenced in a macro's body
-- **Color** can be set for the lines that are drawn, affecting all subsequent 'move' comands. 
+- **Color** can be set for the lines that are drawn, affecting all subsequent 'move' comands.
 
-Notably, there is *no branching* instruction present, as there are *no booleans* present in this language.
+Notably, there is _no branching_ instruction present, as there are _no booleans_ present in this language.
 
 ## Building && Running Locally
 
@@ -69,7 +70,6 @@ npm run build:extension
 
 Then, run the extension by hitting F5 (`File menu` -> `Run` -> `Start debugging`).
 Another VSCode instance will open, and you can open the **examples** folder to see the MiniLogo language in action.
-
 
 ## Running in the Web
 
