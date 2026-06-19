@@ -36,13 +36,15 @@ export function getCommands(commands: any[]): Command[] {
                 result.push({ name: 'penDown', args: undefined } as Command);
                 break;
             case 'move':
-                result.push({ name: 'move', args: { x: command.x, y: command.y } as MoveArgs} as Command);
+                result.push({ name: 'move', args: { x: command.x, y: command.y } as MoveArgs } as Command);
                 break;
             case 'color':
-                result.push({ name: 'color', args: { color: command.color, r: command.r, g: command.g, b: command.b } as ColorArgs } as Command);
+                result.push({
+                    name: 'color',
+                    args: { color: command.color, r: command.r, g: command.g, b: command.b } as ColorArgs
+                } as Command);
                 break;
-
         }
-    })
+    });
     return result;
 }

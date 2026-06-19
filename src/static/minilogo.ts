@@ -2,9 +2,9 @@
 
 // monaco-languageclient imports
 import { EditorApp, type EditorAppConfig } from 'monaco-languageclient/editorApp';
+import { type LanguageClientConfig, LanguageClientWrapper } from 'monaco-languageclient/lcwrapper';
+import { type MonacoVscodeApiConfig, MonacoVscodeApiWrapper } from 'monaco-languageclient/vscodeApiWrapper';
 import { configureDefaultWorkerFactory } from 'monaco-languageclient/workerFactory';
-import { MonacoVscodeApiWrapper, type MonacoVscodeApiConfig } from 'monaco-languageclient/vscodeApiWrapper';
-import { LanguageClientWrapper, type LanguageClientConfig } from 'monaco-languageclient/lcwrapper';
 import { BrowserMessageReader, BrowserMessageWriter } from 'vscode-languageclient/browser';
 
 // load TextMate grammar and language configuration as raw strings (vite ?raw import)
@@ -15,34 +15,36 @@ import textmateGrammar from '../../syntaxes/minilogo.tmLanguage.json?raw';
  * Pen command (up or down)
  */
 type MiniLogoPen = {
-    name: 'penUp' | 'penDown'
+    name: 'penUp' | 'penDown';
 };
 
 /**
  * Move command
  */
 type MiniLogoMove = {
-    name: 'move'
+    name: 'move';
     args: {
         x: number;
         y: number;
-    }
+    };
 };
 
-type HexOrLitColor = {
-    color: string
-} | {
-    r: number
-    g: number
-    b: number
-};
+type HexOrLitColor =
+    | {
+          color: string;
+      }
+    | {
+          r: number;
+          g: number;
+          b: number;
+      };
 
 /**
  * Color command
  */
 type MiniLogoColor = {
-    name: 'color'
-    args: HexOrLitColor
+    name: 'color';
+    args: HexOrLitColor;
 };
 
 /**
@@ -89,7 +91,8 @@ function getMainCode() {
  */
 function getWorker() {
     return new Worker(
-        new URL('../language-server/main-browser.ts', import.meta.url),
+        // new URL('../language-server/main-browser.ts', import.meta.url),
+        new URL('../../out/language-server/main-browser-min.js', import.meta.url),
         { type: 'module', name: 'MiniLogoLS' }
     );
 }
@@ -134,28 +137,34 @@ async function main() {
                 'editor.experimental.asyncTokenization': true
             })
         },
-        extensions: [{
-            config: {
-                name: 'minilogo-language',
-                publisher: 'TypeFox',
-                version: '1.0.0',
-                engines: { vscode: '*' },
-                contributes: {
-                    languages: [{
-                        id: languageId,
-                        extensions: ['.logo'],
-                        aliases: ['MiniLogo', 'minilogo'],
-                        configuration: '/minilogo-configuration.json'
-                    }],
-                    grammars: [{
-                        language: languageId,
-                        scopeName: 'source.minilogo',
-                        path: '/minilogo-grammar.json'
-                    }]
-                }
-            },
-            filesOrContents: extensionFilesOrContents
-        }]
+        extensions: [
+            {
+                config: {
+                    name: 'minilogo-language',
+                    publisher: 'TypeFox',
+                    version: '1.0.0',
+                    engines: { vscode: '*' },
+                    contributes: {
+                        languages: [
+                            {
+                                id: languageId,
+                                extensions: ['.logo'],
+                                aliases: ['MiniLogo', 'minilogo'],
+                                configuration: '/minilogo-configuration.json'
+                            }
+                        ],
+                        grammars: [
+                            {
+                                language: languageId,
+                                scopeName: 'source.minilogo',
+                                path: '/minilogo-grammar.json'
+                            }
+                        ]
+                    }
+                },
+                filesOrContents: extensionFilesOrContents
+            }
+        ]
     };
 
     // configure the language client connection
@@ -202,7 +211,6 @@ async function main() {
     let running = false;
     let timeout: ReturnType<typeof setTimeout> | null = null;
     client.onNotification('browser/DocumentChange', (resp: DocumentChangeResponse) => {
-
         // always store the current program in local storage
         const models = editorApp.getTextModels();
         const value = models.modified?.getValue();
@@ -237,7 +245,6 @@ async function main() {
                 console.error(e);
                 running = false;
             }
-
         }, 200);
     });
 
@@ -245,7 +252,7 @@ async function main() {
      * Takes generated MiniLogo commands, and draws on an HTML5 canvas
      */
     function updateMiniLogoCanvas(cmds: MiniLogoCommand[]) {
-        const canvas : HTMLCanvasElement | null = document.getElementById('minilogo-canvas') as HTMLCanvasElement | null;
+        const canvas: HTMLCanvasElement | null = document.getElementById('minilogo-canvas') as HTMLCanvasElement | null;
         if (!canvas) {
             throw new Error('Unable to find canvas element!');
         }
@@ -259,11 +266,11 @@ async function main() {
 
         context.beginPath();
         context.strokeStyle = '#333';
-        for (let x = 0; x <= canvas.width; x+=(canvas.width / 10)) {
+        for (let x = 0; x <= canvas.width; x += canvas.width / 10) {
             context.moveTo(x, 0);
             context.lineTo(x, canvas.height);
         }
-        for (let y = 0; y <= canvas.height; y+=(canvas.height / 10)) {
+        for (let y = 0; y <= canvas.height; y += canvas.height / 10) {
             context.moveTo(0, y);
             context.lineTo(canvas.width, y);
         }
@@ -329,10 +336,10 @@ async function main() {
                     case 'color':
                         if ((cmd.args as { color: string }).color) {
                             // literal color or hex
-                            context.strokeStyle = (cmd.args  as { color: string }).color;
+                            context.strokeStyle = (cmd.args as { color: string }).color;
                         } else {
                             // literal r,g,b components
-                            const args = cmd.args as { r: number, g: number, b: number };
+                            const args = cmd.args as { r: number; g: number; b: number };
                             context.strokeStyle = `rgb(${args.r},${args.g},${args.b})`;
                         }
                         break;
@@ -340,7 +347,6 @@ async function main() {
                     // fallback in case we missed an instruction
                     default:
                         throw new Error('Unrecognized command received: ' + JSON.stringify(cmd));
-
                 }
             }
         }

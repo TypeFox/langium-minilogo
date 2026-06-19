@@ -5,7 +5,7 @@ import type { MiniLogoServices } from './minilogo-module.js';
 /**
  * Map AST node types to validation checks.
  */
-type MiniLogoChecks = ValidationChecks<MiniLogoAstType>
+type MiniLogoChecks = ValidationChecks<MiniLogoAstType>;
 
 /**
  * Registry for validation checks.
@@ -17,7 +17,7 @@ export class MiniLogoValidationRegistry extends ValidationRegistry {
 
         const checks: MiniLogoChecks = {
             Model: validator.checkUniqueDefs,
-            Def:   validator.checkUniqueParams
+            Def: validator.checkUniqueParams
         };
 
         this.register(checks, validator);
@@ -25,15 +25,14 @@ export class MiniLogoValidationRegistry extends ValidationRegistry {
 }
 
 export class MiniLogoValidator {
-
     checkUniqueDefs(model: AstNode, accept: ValidationAcceptor): void {
         if (!isModel(model)) {
             throw new Error('Retrieve a non-model in validation');
         }
         const reported = new Set();
-        model.defs.forEach(d => {
+        model.defs.forEach((d) => {
             if (reported.has(d.name)) {
-                accept('error',  `Def has non-unique name '${d.name}'.`,  {node: d, property: 'name'});
+                accept('error', `Def has non-unique name '${d.name}'.`, { node: d, property: 'name' });
             }
             reported.add(d.name);
         });
@@ -44,9 +43,9 @@ export class MiniLogoValidator {
             throw new Error('Retrieve a non-def in validation');
         }
         const reported = new Set();
-        def.params.forEach(p => {
+        def.params.forEach((p) => {
             if (reported.has(p.name)) {
-                accept('error', `Param ${p.name} is non-unique for Def '${def.name}'`, {node: p, property: 'name'});
+                accept('error', `Param ${p.name} is non-unique for Def '${def.name}'`, { node: p, property: 'name' });
             }
             reported.add(p.name);
         });

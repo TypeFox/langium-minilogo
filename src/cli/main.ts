@@ -1,13 +1,14 @@
-import { Command } from 'commander';
-import { Model } from '../language-server/generated/ast.js';
-import { MiniLogoLanguageMetaData } from '../language-server/generated/module.js';
-import { NodeFileSystem } from 'langium/node';
-import { createMiniLogoServices } from '../language-server/minilogo-module.js';
-import { extractAstNode } from './cli-util.js';
-import { generateMiniLogoCmds } from '../generator/generator.js';
-import * as url from 'node:url';
 import * as fs from 'node:fs/promises';
 import * as path from 'node:path';
+import * as url from 'node:url';
+import { Command } from 'commander';
+import { NodeFileSystem } from 'langium/node';
+import { generateMiniLogoCmds } from '../generator/generator.js';
+import { Model } from '../language-server/generated/ast.js';
+import { MiniLogoLanguageMetaData } from '../language-server/generated/module.js';
+import { createMiniLogoServices } from '../language-server/minilogo-module.js';
+import { extractAstNode } from './cli-util.js';
+
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
 export const generateAst = async (fileName: string): Promise<void> => {
@@ -25,7 +26,7 @@ export const generateCmds = async (fileName: string): Promise<void> => {
     console.log(JSON.stringify(generateMiniLogoCmds(model)));
 };
 
-export default async function(): Promise<void> {
+export default async function (): Promise<void> {
     const program = new Command();
 
     // dynamically import & get the version from package.json

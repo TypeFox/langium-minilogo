@@ -1,16 +1,15 @@
+import { AstNode, EmptyFileSystem, URI } from 'langium';
+import { LangiumServices } from 'langium/lsp';
+import { generateMiniLogoCmds } from '../generator/generator.js';
 import { Model } from '../language-server/generated/ast.js';
 import { createMiniLogoServices } from '../language-server/minilogo-module.js';
-import { generateMiniLogoCmds } from '../generator/generator.js';
-import { AstNode, EmptyFileSystem } from 'langium';
-import { URI } from 'langium';
-import { LangiumServices } from 'langium/lsp';
 
 /**
  * Parses a MiniLogo program & generates output as a list of Objects
  * @param miniLogoProgram MiniLogo program to parse
  * @returns Generated output from this MiniLogo program
  */
-export async function parseAndGenerate (miniLogoProgram: string): Promise<Object[]> {
+export async function parseAndGenerate(miniLogoProgram: string): Promise<object[]> {
     const services = createMiniLogoServices(EmptyFileSystem).MiniLogo;
     const model = await extractAstNodeFromString<Model>(miniLogoProgram, services);
     // generate mini logo drawing commands from the model

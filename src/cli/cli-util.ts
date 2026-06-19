@@ -1,9 +1,8 @@
 import chalk from 'chalk';
-import path from 'path';
 import fs from 'fs';
-import { AstNode, LangiumDocument } from 'langium';
-import { URI } from 'langium';
+import { AstNode, LangiumDocument, URI } from 'langium';
 import { LangiumServices } from 'langium/lsp';
+import path from 'path';
 
 export async function extractDocument(fileName: string, services: LangiumServices): Promise<LangiumDocument> {
     const extensions = services.LanguageMetaData.fileExtensions;
@@ -20,13 +19,15 @@ export async function extractDocument(fileName: string, services: LangiumService
     const document = await services.shared.workspace.LangiumDocuments.getOrCreateDocument(URI.file(path.resolve(fileName)));
     await services.shared.workspace.DocumentBuilder.build([document], { validation: true });
 
-    const validationErrors = (document.diagnostics ?? []).filter(e => e.severity === 1);
+    const validationErrors = (document.diagnostics ?? []).filter((e) => e.severity === 1);
     if (validationErrors.length > 0) {
         console.error(chalk.red('There are validation errors:'));
         for (const validationError of validationErrors) {
-            console.error(chalk.red(
-                `line ${validationError.range.start.line + 1}: ${validationError.message} [${document.textDocument.getText(validationError.range)}]`
-            ));
+            console.error(
+                chalk.red(
+                    `line ${validationError.range.start.line + 1}: ${validationError.message} [${document.textDocument.getText(validationError.range)}]`
+                )
+            );
         }
         process.exit(1);
     }
@@ -39,12 +40,12 @@ export async function extractAstNode<T extends AstNode>(fileName: string, servic
 }
 
 interface FilePathData {
-    destination: string,
-    name: string
+    destination: string;
+    name: string;
 }
 
 export function extractDestinationAndName(filePath: string, destination: string | undefined): FilePathData {
-    filePath = filePath.replace(/\.[^\\\/]*$/, '').replace(/[-]/g, '');
+    filePath = filePath.replace(/\.[^\\/]*$/, '').replace(/[-]/g, '');
     return {
         destination: destination ?? path.join(path.dirname(filePath), 'generated'),
         name: path.basename(filePath)

@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
 import * as path from 'node:path';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
     root: 'src/static',

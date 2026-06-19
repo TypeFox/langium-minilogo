@@ -1,5 +1,15 @@
-import { Module, inject } from 'langium';
-import { LangiumServices, PartialLangiumServices, AbstractExecuteCommandHandler, ExecuteCommandAcceptor, DefaultSharedModuleContext, LangiumSharedServices, createDefaultSharedModule, createDefaultModule, PartialLangiumSharedServices } from 'langium/lsp';
+import { inject, Module } from 'langium';
+import {
+    AbstractExecuteCommandHandler,
+    createDefaultModule,
+    createDefaultSharedModule,
+    DefaultSharedModuleContext,
+    ExecuteCommandAcceptor,
+    LangiumServices,
+    LangiumSharedServices,
+    PartialLangiumServices,
+    PartialLangiumSharedServices
+} from 'langium/lsp';
 import { parseAndGenerate } from '../web/main.js';
 import { MiniLogoGeneratedModule, MiniLogoGeneratedSharedModule } from './generated/module.js';
 import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-validator.js';
@@ -9,15 +19,15 @@ import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-valida
  */
 export type MiniLogoAddedServices = {
     validation: {
-        MiniLogoValidator: MiniLogoValidator
-    }
-}
+        MiniLogoValidator: MiniLogoValidator;
+    };
+};
 
 /**
  * Union of Langium default services and your custom services - use this as constructor parameter
  * of custom service classes.
  */
-export type MiniLogoServices = LangiumServices & MiniLogoAddedServices
+export type MiniLogoServices = LangiumServices & MiniLogoAddedServices;
 
 /**
  * Dependency injection module that overrides Langium default services and contributes the
@@ -28,12 +38,12 @@ export const MiniLogoModule: Module<MiniLogoServices, PartialLangiumServices & M
     validation: {
         ValidationRegistry: (services) => new MiniLogoValidationRegistry(services),
         MiniLogoValidator: () => new MiniLogoValidator()
-    },
+    }
 };
 
 class MiniLogoCommandHandler extends AbstractExecuteCommandHandler {
     registerCommands(acceptor: ExecuteCommandAcceptor): void {
-        acceptor('parseAndGenerate', args => {
+        acceptor('parseAndGenerate', (args) => {
             // invoke generator on this data, and return response
             return parseAndGenerate(args[0]);
         });
@@ -65,19 +75,11 @@ export const CustomMiniLogoSharedModule: Module<LangiumSharedServices, PartialLa
  * @returns An object wrapping the shared services and the language-specific services
  */
 export function createMiniLogoServices(context: DefaultSharedModuleContext): {
-    shared: LangiumSharedServices,
-    MiniLogo: MiniLogoServices
+    shared: LangiumSharedServices;
+    MiniLogo: MiniLogoServices;
 } {
-    const shared = inject(
-        createDefaultSharedModule(context),
-        MiniLogoGeneratedSharedModule,
-        CustomMiniLogoSharedModule
-    );
-    const MiniLogo = inject(
-        createDefaultModule({ shared }),
-        MiniLogoGeneratedModule,
-        MiniLogoModule
-    );
+    const shared = inject(createDefaultSharedModule(context), MiniLogoGeneratedSharedModule, CustomMiniLogoSharedModule);
+    const MiniLogo = inject(createDefaultModule({ shared }), MiniLogoGeneratedModule, MiniLogoModule);
     shared.ServiceRegistry.register(MiniLogo);
     return { shared, MiniLogo };
 }
