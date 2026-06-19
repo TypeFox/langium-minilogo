@@ -5,7 +5,7 @@
  ******************************************************************************/
 
 import { EmptyFileSystem, DocumentState } from 'langium';
-import { BrowserMessageReader, BrowserMessageWriter, Diagnostic, NotificationType, createConnection } from 'vscode-languageserver/browser.js';
+import { BrowserMessageReader, BrowserMessageWriter, Diagnostic, NotificationType, createConnection } from 'vscode-languageserver/browser';
 import { createMiniLogoServices } from './minilogo-module.js';
 import { Model } from './generated/ast.js';
 import { Command, getCommands } from './minilogo-actions.js';

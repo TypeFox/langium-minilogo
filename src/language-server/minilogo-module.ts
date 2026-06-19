@@ -1,5 +1,5 @@
 import { Module, inject } from 'langium';
-import { LangiumServices, PartialLangiumServices, AbstractExecuteCommandHandler, ExecuteCommandAcceptor, DefaultSharedModuleContext, LangiumSharedServices, createDefaultSharedModule, createDefaultModule } from 'langium/lsp';
+import { LangiumServices, PartialLangiumServices, AbstractExecuteCommandHandler, ExecuteCommandAcceptor, DefaultSharedModuleContext, LangiumSharedServices, createDefaultSharedModule, createDefaultModule, PartialLangiumSharedServices } from 'langium/lsp';
 import { parseAndGenerate } from '../web/main.js';
 import { MiniLogoGeneratedModule, MiniLogoGeneratedSharedModule } from './generated/module.js';
 import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-validator.js';
@@ -41,6 +41,15 @@ class MiniLogoCommandHandler extends AbstractExecuteCommandHandler {
 }
 
 /**
+ * Custom minilogo shared module that we can use
+ */
+export const CustomMiniLogoSharedModule: Module<LangiumSharedServices, PartialLangiumSharedServices> = {
+    lsp: {
+        ExecuteCommandHandler: () => new MiniLogoCommandHandler()
+    }
+};
+
+/**
  * Create the full set of services required by Langium.
  *
  * First inject the shared services by merging two modules:
@@ -61,14 +70,14 @@ export function createMiniLogoServices(context: DefaultSharedModuleContext): {
 } {
     const shared = inject(
         createDefaultSharedModule(context),
-        MiniLogoGeneratedSharedModule
+        MiniLogoGeneratedSharedModule,
+        CustomMiniLogoSharedModule
     );
     const MiniLogo = inject(
         createDefaultModule({ shared }),
         MiniLogoGeneratedModule,
         MiniLogoModule
     );
-    shared.lsp.ExecuteCommandHandler = new MiniLogoCommandHandler();
     shared.ServiceRegistry.register(MiniLogo);
     return { shared, MiniLogo };
 }

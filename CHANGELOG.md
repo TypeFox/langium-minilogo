@@ -1,5 +1,19 @@
 # CHANGELOG
 
+# 4.0.0
+
+- **Breaking:** Migrated web editor from `monaco-editor-wrapper` to `monaco-languageclient` (Extended Mode)
+- **Breaking:** Updated to Langium 4.3.0 (from 3.x)
+- Replaced esbuild/shell-script web bundling pipeline with Vite
+- Switched from Monarch grammar to TextMate grammar for syntax highlighting
+- Language server worker now bundled as ESM (was IIFE)
+- Added `npm run dev` script for Vite dev server
+- Updated to Node.js >=24
+- Renamed `index.ts` to `main.ts` for language server entry points
+- Updated to `monaco-editor-wrapper` v4 (intermediate step, now fully replaced)
+- Updated to Langium 3.0.0 (intermediate step, now at 4.3.0)
+- Various package and build fixes
+
 # 2.0.0
 
 - Moved to ESM

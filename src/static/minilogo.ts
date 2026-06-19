@@ -1,5 +1,15 @@
-import { MonacoEditorLanguageClientWrapper, UserConfig } from "monaco-editor-wrapper/bundle";
-import { useWorkerFactory } from "monaco-editor-wrapper/workerFactory";
+/// <reference types="vite/client" />
+
+// monaco-languageclient imports
+import { EditorApp, type EditorAppConfig } from 'monaco-languageclient/editorApp';
+import { configureDefaultWorkerFactory } from 'monaco-languageclient/workerFactory';
+import { MonacoVscodeApiWrapper, type MonacoVscodeApiConfig } from 'monaco-languageclient/vscodeApiWrapper';
+import { LanguageClientWrapper, type LanguageClientConfig } from 'monaco-languageclient/lcwrapper';
+import { BrowserMessageReader, BrowserMessageWriter } from 'vscode-languageclient/browser';
+
+// load TextMate grammar and language configuration as raw strings (vite ?raw import)
+import languageConfig from '../../language-configuration.json?raw';
+import textmateGrammar from '../../syntaxes/minilogo.tmLanguage.json?raw';
 
 /**
  * Pen command (up or down)
@@ -40,99 +50,8 @@ type MiniLogoColor = {
  */
 type MiniLogoCommand = MiniLogoPen | MiniLogoMove | MiniLogoColor;
 
-export type WorkerUrl = string;
-
-/**
- * Generalized configuration used with 'getMonacoEditorReactConfig' to generate a working configuration for monaco-editor-react
- */
-export interface ClassicConfig {
-    code: string,
-    languageId: string,
-    worker: WorkerUrl | Worker,
-    monarchGrammar: any;
-}
-
-/**
- * Generates a UserConfig for a given Langium example, which is then passed to the monaco-editor-react component
- * 
- * @param config A VSCode API or classic editor config to generate a UserConfig from
- * @returns A completed UserConfig
- */
-export function createUserConfig(config: ClassicConfig): UserConfig {
-    // setup urls for config & grammar
-    const id = config.languageId;
-
-    // generate langium config
-    return {
-        wrapperConfig: {
-            editorAppConfig: {
-                $type: 'classic',
-                languageId: id,
-                useDiffEditor: false,
-                code: config.code,
-                theme: 'vs-dark',
-                languageDef: config.monarchGrammar
-            },
-            serviceConfig: {
-                debugLogging: false
-            }
-        },
-        languageClientConfig: {
-            options: {
-                $type: 'WorkerDirect',
-                worker: config.worker as Worker,
-                name: `${id}-language-server-worker`
-            }
-        }
-    };
-}
-
-/**
- * Prepare to setup the wrapper, building the worker def & setting up styles
- */
-function setup() {
-    const workerUrl = new URL('monaco-editor-wrapper/dist/workers/editorWorker-es.js', window.location.href).href;
-    useWorkerFactory({
-        ignoreMapping: true,
-        workerLoaders: {
-            editorWorkerService: () => new Worker(workerUrl, { type: 'module' })
-        }
-    });
-}
-
-/**
- * Returns a Monarch grammar definition for MiniLogo
- */
-function getMonarchGrammar() {
-    return {
-        keywords: [
-            'color','def','down','for','move','pen','to','up'
-        ],
-        operators: [
-            '-',',','*','/','+','='
-        ],
-        symbols:  /-|,|\(|\)|\{|\}|\*|\/|\+|=/,
-    
-        tokenizer: {
-            initial: [
-                { regex: /#(\d|[a-fA-F]){3,6}/, action: {"token":"string"} },
-                { regex: /[_a-zA-Z][\w_]*/, action: { cases: { '@keywords': {"token":"keyword"}, '@default': {"token":"string"} }} },
-                { regex: /(?:(?:-?[0-9]+)?\.[0-9]+)|-?[0-9]+/, action: {"token":"number"} },
-                { include: '@whitespace' },
-                { regex: /@symbols/, action: { cases: { '@operators': {"token":"operator"}, '@default': {"token":""} }} },
-            ],
-            whitespace: [
-                { regex: /\s+/, action: {"token":"white"} },
-                { regex: /\/\*/, action: {"token":"comment","next":"@comment"} },
-                { regex: /\/\/[^\n\r]*/, action: {"token":"comment"} },
-            ],
-            comment: [
-                { regex: /[^\/\*]+/, action: {"token":"comment"} },
-                { regex: /\*\//, action: {"token":"comment","next":"@pop"} },
-                { regex: /[\/\*]/, action: {"token":"comment"} },
-            ],
-        }
-    };
+interface DocumentChangeResponse {
+    content: string;
 }
 
 /**
@@ -151,9 +70,9 @@ function getMainCode() {
     }
     color(white)
     test()
-    
+
     `;
-    
+
     // seek to restore any previous code from our last session
     if (window.localStorage) {
         const storedCode = window.localStorage.getItem('mainCode');
@@ -169,11 +88,10 @@ function getMainCode() {
  * Creates & returns a fresh worker using the Minilogo language server
  */
 function getWorker() {
-    const workerURL = new URL('minilogo-server-worker.js', window.location.href);
-    return new Worker(workerURL.href, {
-        type: 'module',
-        name: 'MiniLogoLS'
-    });
+    return new Worker(
+        new URL('../language-server/main-browser.ts', import.meta.url),
+        { type: 'module', name: 'MiniLogoLS' }
+    );
 }
 
 /**
@@ -188,31 +106,106 @@ function setStatus(msg: string) {
 }
 
 async function main() {
-    // setup worker def & styles
-    setup();
-    
-    // setup a new wrapper
-    // keep a reference to a promise for when the editor is finished starting, we'll use this to setup the canvas on load
-    const wrapper = new MonacoEditorLanguageClientWrapper();
-    const userConfig = createUserConfig({
-        languageId: 'minilogo',
-        code: getMainCode(),
-        worker: getWorker(),
-        monarchGrammar: getMonarchGrammar()
-    })
-    await wrapper.initAndStart(userConfig, document.getElementById("monaco-editor-root")!);
+    const languageId = 'minilogo';
 
-    const client = wrapper.getLanguageClient();
+    // create the language server worker and message transports
+    const worker = getWorker();
+    const reader = new BrowserMessageReader(worker);
+    const writer = new BrowserMessageWriter(worker);
+
+    // register TextMate grammar and language config as a virtual extension
+    const extensionFilesOrContents = new Map<string, string | URL>();
+    extensionFilesOrContents.set('/minilogo-configuration.json', languageConfig);
+    extensionFilesOrContents.set('/minilogo-grammar.json', textmateGrammar);
+
+    // configure the VS Code API layer
+    const vscodeApiConfig: MonacoVscodeApiConfig = {
+        $type: 'extended',
+        viewsConfig: {
+            $type: 'EditorService',
+            htmlContainer: document.getElementById('monaco-editor-root')!
+        },
+        monacoWorkerFactory: configureDefaultWorkerFactory,
+        userConfiguration: {
+            json: JSON.stringify({
+                'workbench.colorTheme': 'Default Dark Modern',
+                'editor.guides.bracketPairsHorizontal': 'active',
+                'editor.wordBasedSuggestions': 'off',
+                'editor.experimental.asyncTokenization': true
+            })
+        },
+        extensions: [{
+            config: {
+                name: 'minilogo-language',
+                publisher: 'TypeFox',
+                version: '1.0.0',
+                engines: { vscode: '*' },
+                contributes: {
+                    languages: [{
+                        id: languageId,
+                        extensions: ['.logo'],
+                        aliases: ['MiniLogo', 'minilogo'],
+                        configuration: '/minilogo-configuration.json'
+                    }],
+                    grammars: [{
+                        language: languageId,
+                        scopeName: 'source.minilogo',
+                        path: '/minilogo-grammar.json'
+                    }]
+                }
+            },
+            filesOrContents: extensionFilesOrContents
+        }]
+    };
+
+    // configure the language client connection
+    const languageClientConfig: LanguageClientConfig = {
+        languageId,
+        clientOptions: {
+            documentSelector: [languageId]
+        },
+        connection: {
+            options: {
+                $type: 'WorkerDirect',
+                worker
+            },
+            messageTransports: { reader, writer }
+        }
+    };
+
+    // configure the editor content
+    const editorAppConfig: EditorAppConfig = {
+        codeResources: {
+            modified: {
+                text: getMainCode(),
+                uri: '/workspace/example.minilogo'
+            }
+        }
+    };
+
+    // start in order: API wrapper -> language client -> editor app
+    const apiWrapper = new MonacoVscodeApiWrapper(vscodeApiConfig);
+    await apiWrapper.start();
+
+    const lcWrapper = new LanguageClientWrapper(languageClientConfig);
+    await lcWrapper.start();
+
+    const editorApp = new EditorApp(editorAppConfig);
+    await editorApp.start(document.getElementById('monaco-editor-root')!);
+
+    // get the language client for notification handling
+    const client = lcWrapper.getLanguageClient();
     if (!client) {
-        throw new Error('Unable to obtain language client for the Minilogo!');
+        throw new Error('Unable to obtain language client for MiniLogo!');
     }
 
     let running = false;
-    let timeout: NodeJS.Timeout | null = null;
-    client.onNotification('browser/DocumentChange', (resp) => {
+    let timeout: ReturnType<typeof setTimeout> | null = null;
+    client.onNotification('browser/DocumentChange', (resp: DocumentChangeResponse) => {
 
-        // always store this new program in local storage
-        const value = wrapper.getModel()?.getValue();
+        // always store the current program in local storage
+        const models = editorApp.getTextModels();
+        const value = models.modified?.getValue();
         if (window.localStorage && value) {
             window.localStorage.setItem('mainCode', value);
         }
@@ -221,7 +214,7 @@ async function main() {
         if (running) {
             return;
         }
-        
+
         // clear previous timeouts
         if (timeout) {
             clearTimeout(timeout);
@@ -247,7 +240,7 @@ async function main() {
 
         }, 200);
     });
-    
+
     /**
      * Takes generated MiniLogo commands, and draws on an HTML5 canvas
      */
@@ -261,9 +254,9 @@ async function main() {
         if (!context) {
             throw new Error('Unable to get canvas context!');
         }
-    
+
         context.clearRect(0, 0, canvas.width, canvas.height);
-    
+
         context.beginPath();
         context.strokeStyle = '#333';
         for (let x = 0; x <= canvas.width; x+=(canvas.width / 10)) {
@@ -275,14 +268,14 @@ async function main() {
             context.lineTo(canvas.width, y);
         }
         context.stroke();
-    
+
         context.strokeStyle = 'white';
-    
+
         // maintain some state about our drawing context
         let drawing = false;
         let posX = 0;
         let posY = 0;
-    
+
         const doneDrawingPromise = new Promise((resolve) => {
             // use the command list to execute each command with a small delay
             const id = setInterval(() => {
@@ -298,7 +291,7 @@ async function main() {
                 }
             }, 1);
         });
-    
+
         // dispatches a single command in the current context
         function dispatchCommand(cmd: MiniLogoCommand, context: CanvasRenderingContext2D) {
             if (cmd.name) {
@@ -308,14 +301,14 @@ async function main() {
                         drawing = false;
                         context.stroke();
                         break;
-    
+
                     // pen is put down onto the canvas
                     case 'penDown':
                         drawing = true;
                         context.beginPath();
                         context.moveTo(posX, posY);
                         break;
-    
+
                     // move across the canvas
                     // will draw only if the pen is 'down'
                     case 'move':
@@ -331,7 +324,7 @@ async function main() {
                             context.lineTo(posX, posY);
                         }
                         break;
-    
+
                     // set the color of the stroke
                     case 'color':
                         if ((cmd.args as { color: string }).color) {
@@ -347,7 +340,7 @@ async function main() {
                     // fallback in case we missed an instruction
                     default:
                         throw new Error('Unrecognized command received: ' + JSON.stringify(cmd));
-    
+
                 }
             }
         }
