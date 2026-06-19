@@ -61,10 +61,10 @@
         "format:fix": "biome check --write .",
         "clean": "rm -rf ./public && rm -rf ./out",
         "vscode:prepublish": "npm run langium:generate && npm run build:extension && npm run lint",
-        "build": "npm run clean && npm run build:tsc && npm run build:web && npm run build:extension",
+        "build": "npm run clean && npm run build:tsc && npm run build:extension && npm run build:web",
         "build:extension": "npm run esbuild:extension && npm run esbuild:ls",
         "esbuild:extension": "esbuild ./src/extension.ts --minify --bundle --outfile=out/extension.cjs --external:vscode --format=cjs --platform=node",
-        "esbuild:ls": "esbuild ./src/language-server/main.ts --minify --bundle --outfile=out/language-server/main-browser-min.js --format=esm --platform=node",
+        "esbuild:ls": "esbuild ./src/language-server/main-browser.ts --minify --bundle --outfile=out/language-server/main-browser-min.js --format=esm --platform=browser",
         "build:web": "vite build",
         "build:tsc": "tsc -b tsconfig.json",
         "dev": "vite serve --config vite.config.ts",
@@ -76,6 +76,7 @@
         "serve": "vite preview --config vite.config.ts"
     },
     "dependencies": {
+        "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
         "chalk": "5.6.2",
         "commander": "~15.0.0",
         "langium": "~4.3.0",
