@@ -13,7 +13,8 @@
     "description": "An implementation of the MiniLogo Language in Langium",
     "version": "4.0.0",
     "engines": {
-        "node": ">=24"
+        "node": ">=24",
+        "vscode": "^1.120.0"
     },
     "categories": [
         "Programming Languages"
@@ -45,14 +46,21 @@
     ],
     "files": [
         "bin",
-        "out",
-        "src",
+        "out/language-server/main-browser-min.js",
+        "out/cli",
+        "out/extension",
+        "out/web",
         "syntaxes"
     ],
     "bin": {
         "minilogo-cli": "bin/minilogo.js"
     },
-    "exports": "./out/extension.cjs",
+    "exports": {
+        ".": "./out/extension.cjs",
+        "./ls-web": "./out/language-server/main-browser-min.js",
+        "./cli": "./out/cli/main.js",
+        "./web": "./out/web/main.js"
+    },
     "main": "./out/extension.cjs",
     "scripts": {
         "knip": "knip",

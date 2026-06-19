@@ -14,6 +14,9 @@
 - Updated to Langium 3.0.0 (intermediate step, now at 4.3.0)
 - Various package and build fixes
 
+- **Known issues**
+- Self hosted web example not working, going to drop and move in favor of hosting in the monaco-languageclient directly
+
 # 2.0.0
 
 - Moved to ESM
