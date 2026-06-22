@@ -7,5 +7,8 @@
         "src/language-server/main-browser.ts"
     ],
     "project": ["src/**/*.ts"],
-    "ignore": ["src/language-server/generated/**"]
+    "ignore": [
+        "src/language-server/generated/**",
+        "src/language-server/main.ts"
+    ]
 }

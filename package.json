@@ -84,15 +84,14 @@
         "serve": "vite preview --config vite.config.ts"
     },
     "dependencies": {
-        "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
         "chalk": "5.6.2",
         "commander": "~15.0.0",
         "langium": "~4.3.0",
-        "monaco-languageclient": "~10.7.0",
         "vscode-languageclient": "~10.0.0",
         "vscode-languageserver": "~10.0.0"
     },
     "devDependencies": {
+        "monaco-languageclient": "~10.7.0",
         "@biomejs/biome": "2.5.0",
         "@types/node": "~24.1.0",
         "@types/vscode": "~1.120.0",
@@ -101,7 +100,8 @@
         "langium-cli": "~4.3.0",
         "oxlint": "1.70.0",
         "typescript": "~6.0.3",
-        "vite": "^8.0.16"
+        "vite": "^8.0.16",
+        "@codingame/esbuild-import-meta-url-plugin": "^1.0.3"
     },
     "repository": {
         "type": "git",

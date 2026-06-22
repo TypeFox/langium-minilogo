@@ -3,7 +3,7 @@ export interface Command {
     args: MoveArgs | ColorArgs | undefined;
 }
 
-export interface MoveArgs {
+interface MoveArgs {
     x: number;
     y: number;
 }
@@ -11,7 +11,7 @@ export interface MoveArgs {
 /**
  * Either a hex value or RGB values can be provided, not both.
  */
-export interface ColorArgs {
+interface ColorArgs {
     /** A hex value for a color */
     color?: string;
     /** RGB values for a color */

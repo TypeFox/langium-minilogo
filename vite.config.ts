@@ -4,9 +4,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
     root: 'src/static',
-    plugins: [
-        importMetaUrlPlugin
-    ],
+    plugins: [importMetaUrlPlugin],
     build: {
         outDir: path.resolve(__dirname, 'public'),
         emptyOutDir: true

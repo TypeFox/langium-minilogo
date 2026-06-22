@@ -17,7 +17,7 @@ import { MiniLogoValidationRegistry, MiniLogoValidator } from './minilogo-valida
 /**
  * Declaration of custom services - add your own service classes here.
  */
-export type MiniLogoAddedServices = {
+type MiniLogoAddedServices = {
     validation: {
         MiniLogoValidator: MiniLogoValidator;
     };
@@ -34,7 +34,7 @@ export type MiniLogoServices = LangiumServices & MiniLogoAddedServices;
  * declared custom services. The Langium defaults can be partially specified to override only
  * selected services, while the custom services must be fully specified.
  */
-export const MiniLogoModule: Module<MiniLogoServices, PartialLangiumServices & MiniLogoAddedServices> = {
+const MiniLogoModule: Module<MiniLogoServices, PartialLangiumServices & MiniLogoAddedServices> = {
     validation: {
         ValidationRegistry: (services) => new MiniLogoValidationRegistry(services),
         MiniLogoValidator: () => new MiniLogoValidator()
@@ -53,7 +53,7 @@ class MiniLogoCommandHandler extends AbstractExecuteCommandHandler {
 /**
  * Custom minilogo shared module that we can use
  */
-export const CustomMiniLogoSharedModule: Module<LangiumSharedServices, PartialLangiumSharedServices> = {
+const CustomMiniLogoSharedModule: Module<LangiumSharedServices, PartialLangiumSharedServices> = {
     lsp: {
         ExecuteCommandHandler: () => new MiniLogoCommandHandler()
     }

@@ -1,6 +1,6 @@
-import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
-import * as url from 'node:url';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import url from 'node:url';
 import { Command } from 'commander';
 import { NodeFileSystem } from 'langium/node';
 import { generateMiniLogoCmds } from '../generator/generator.js';
@@ -11,7 +11,7 @@ import { extractAstNode } from './cli-util.js';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
-export const generateAst = async (fileName: string): Promise<void> => {
+const generateAst = async (fileName: string): Promise<void> => {
     const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
     const model = await extractAstNode<Model>(fileName, services);
     // serialize & output the model ast
@@ -19,7 +19,7 @@ export const generateAst = async (fileName: string): Promise<void> => {
     console.log(serializedAst);
 };
 
-export const generateCmds = async (fileName: string): Promise<void> => {
+const generateCmds = async (fileName: string): Promise<void> => {
     const services = createMiniLogoServices(NodeFileSystem).MiniLogo;
     const model = await extractAstNode<Model>(fileName, services);
     // directly output these commands to the console

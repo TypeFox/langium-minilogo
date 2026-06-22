@@ -4,7 +4,7 @@ import { AstNode, LangiumDocument, URI } from 'langium';
 import { LangiumServices } from 'langium/lsp';
 import path from 'path';
 
-export async function extractDocument(fileName: string, services: LangiumServices): Promise<LangiumDocument> {
+async function extractDocument(fileName: string, services: LangiumServices): Promise<LangiumDocument> {
     const extensions = services.LanguageMetaData.fileExtensions;
     if (!extensions.includes(path.extname(fileName))) {
         console.error(chalk.yellow(`Please choose a file with one of these extensions: ${extensions}.`));
@@ -37,17 +37,4 @@ export async function extractDocument(fileName: string, services: LangiumService
 
 export async function extractAstNode<T extends AstNode>(fileName: string, services: LangiumServices): Promise<T> {
     return (await extractDocument(fileName, services)).parseResult?.value as T;
-}
-
-interface FilePathData {
-    destination: string;
-    name: string;
-}
-
-export function extractDestinationAndName(filePath: string, destination: string | undefined): FilePathData {
-    filePath = filePath.replace(/\.[^\\/]*$/, '').replace(/[-]/g, '');
-    return {
-        destination: destination ?? path.join(path.dirname(filePath), 'generated'),
-        name: path.basename(filePath)
-    };
 }
