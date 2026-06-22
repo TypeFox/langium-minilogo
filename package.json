@@ -1,5 +1,6 @@
 {
     "name": "langium-minilogo",
+    "version": "4.0.1",
     "displayName": "MiniLogo",
     "icon": "icon.png",
     "type": "module",
@@ -11,7 +12,6 @@
     ],
     "publisher": "TypeFox",
     "description": "An implementation of the MiniLogo Language in Langium",
-    "version": "4.0.0",
     "engines": {
         "node": ">=24",
         "vscode": "^1.120.0"
@@ -37,7 +37,7 @@
             {
                 "language": "minilogo",
                 "scopeName": "source.minilogo",
-                "path": "./syntaxes/minilogo.tmLanguage.json"
+                "path": "./syntaxes/minilogo.tmLanguage.custom.json"
             }
         ]
     },
@@ -75,13 +75,12 @@
         "esbuild:ls": "esbuild ./src/language-server/main-browser.ts --minify --bundle --outfile=out/language-server/main-browser-min.js --format=esm --platform=browser",
         "build:web": "vite build",
         "build:tsc": "tsc -b tsconfig.json",
-        "dev": "vite serve --config vite.config.ts",
+        "serve": "node out/web/app.js",
         "watch": "tsc -b tsconfig.json --watch",
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
         "generate:test": "./bin/minilogo.js generate ./examples/simple.logo",
-        "generate:logo": "./bin/minilogo.js generate ./examples/langium.logo",
-        "serve": "vite preview --config vite.config.ts"
+        "generate:logo": "./bin/minilogo.js generate ./examples/langium.logo"
     },
     "dependencies": {
         "chalk": "5.6.2",
@@ -91,17 +90,17 @@
         "vscode-languageserver": "~10.0.0"
     },
     "devDependencies": {
-        "monaco-languageclient": "~10.7.0",
         "@biomejs/biome": "2.5.0",
+        "@codingame/esbuild-import-meta-url-plugin": "^1.0.3",
         "@types/node": "~24.1.0",
         "@types/vscode": "~1.120.0",
         "esbuild": "~0.28.1",
         "knip": "6.17.1",
         "langium-cli": "~4.3.0",
+        "monaco-languageclient": "~10.7.0",
         "oxlint": "1.70.0",
         "typescript": "~6.0.3",
-        "vite": "^8.0.16",
-        "@codingame/esbuild-import-meta-url-plugin": "^1.0.3"
+        "vite": "^8.0.16"
     },
     "repository": {
         "type": "git",

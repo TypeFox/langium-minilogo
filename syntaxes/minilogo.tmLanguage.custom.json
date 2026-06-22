@@ -1,0 +1,294 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "MiniLogo",
+  "scopeName": "source.minilogo",
+  "fileTypes": [".logo"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#definition" },
+    { "include": "#for-loop" },
+    { "include": "#builtin-call" },
+    { "include": "#macro-call" },
+    { "include": "#hex-color" },
+    { "include": "#numbers" },
+    { "include": "#operators" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.block.minilogo",
+          "begin": "/\\*",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.begin.minilogo" }
+          },
+          "end": "\\*/",
+          "endCaptures": {
+            "0": { "name": "punctuation.definition.comment.end.minilogo" }
+          }
+        },
+        {
+          "name": "comment.line.double-slash.minilogo",
+          "begin": "//",
+          "beginCaptures": {
+            "0": { "name": "punctuation.definition.comment.minilogo" }
+          },
+          "end": "$"
+        }
+      ]
+    },
+
+    "definition": {
+      "comment": "Function definition: def name(param1, param2) { ... }",
+      "begin": "\\b(def)\\s+([_a-zA-Z]\\w*)",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.def.minilogo" },
+        "2": { "name": "entity.name.function.minilogo" }
+      },
+      "end": "(?<=\\})",
+      "patterns": [
+        { "include": "#parameter-list" },
+        { "include": "#block" }
+      ]
+    },
+
+    "parameter-list": {
+      "comment": "Parameter list in a def declaration",
+      "begin": "\\(",
+      "beginCaptures": {
+        "0": { "name": "punctuation.parenthesis.open.minilogo" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.parenthesis.close.minilogo" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        {
+          "name": "variable.parameter.minilogo",
+          "match": "\\b[_a-zA-Z]\\w*\\b"
+        },
+        {
+          "name": "punctuation.separator.comma.minilogo",
+          "match": ","
+        }
+      ]
+    },
+
+    "block": {
+      "comment": "Block body: { ... }",
+      "begin": "\\{",
+      "beginCaptures": {
+        "0": { "name": "punctuation.brace.open.minilogo" }
+      },
+      "end": "\\}",
+      "endCaptures": {
+        "0": { "name": "punctuation.brace.close.minilogo" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#for-loop" },
+        { "include": "#builtin-call" },
+        { "include": "#macro-call" },
+        { "include": "#hex-color" },
+        { "include": "#numbers" },
+        { "include": "#operators" },
+        { "include": "#punctuation" }
+      ]
+    },
+
+    "for-loop": {
+      "comment": "for var = expr to expr { ... }",
+      "begin": "\\b(for)\\s+([_a-zA-Z]\\w*)\\s*(=)",
+      "beginCaptures": {
+        "1": { "name": "keyword.control.for.minilogo" },
+        "2": { "name": "variable.other.loop.minilogo" },
+        "3": { "name": "keyword.operator.assignment.minilogo" }
+      },
+      "end": "(?=\\{)",
+      "patterns": [
+        {
+          "name": "keyword.control.to.minilogo",
+          "match": "\\bto\\b"
+        },
+        { "include": "#expression" }
+      ]
+    },
+
+    "builtin-call": {
+      "comment": "Built-in commands: pen(), move(), color()",
+      "patterns": [
+        { "include": "#pen-call" },
+        { "include": "#move-call" },
+        { "include": "#color-call" }
+      ]
+    },
+
+    "pen-call": {
+      "comment": "pen(up) or pen(down)",
+      "begin": "\\b(pen)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "support.function.builtin.minilogo" },
+        "2": { "name": "punctuation.parenthesis.open.minilogo" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.parenthesis.close.minilogo" }
+      },
+      "patterns": [
+        {
+          "name": "constant.language.pen-mode.minilogo",
+          "match": "\\b(up|down)\\b"
+        }
+      ]
+    },
+
+    "move-call": {
+      "comment": "move(expr, expr)",
+      "begin": "\\b(move)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "support.function.builtin.minilogo" },
+        "2": { "name": "punctuation.parenthesis.open.minilogo" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.parenthesis.close.minilogo" }
+      },
+      "patterns": [
+        { "include": "#expression" },
+        { "include": "#punctuation" }
+      ]
+    },
+
+    "color-call": {
+      "comment": "color(r, g, b) or color(#hex) or color(name)",
+      "begin": "\\b(color)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "support.function.builtin.minilogo" },
+        "2": { "name": "punctuation.parenthesis.open.minilogo" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.parenthesis.close.minilogo" }
+      },
+      "patterns": [
+        { "include": "#hex-color" },
+        {
+          "comment": "Named color identifier inside color()",
+          "name": "support.constant.color-name.minilogo",
+          "match": "\\b(?!\\d)[_a-zA-Z]\\w*\\b"
+        },
+        { "include": "#expression" },
+        { "include": "#punctuation" }
+      ]
+    },
+
+    "macro-call": {
+      "comment": "User-defined macro call: name(args...)",
+      "begin": "\\b([_a-zA-Z]\\w*)\\s*(\\()",
+      "beginCaptures": {
+        "1": { "name": "entity.name.function.call.minilogo" },
+        "2": { "name": "punctuation.parenthesis.open.minilogo" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.parenthesis.close.minilogo" }
+      },
+      "patterns": [
+        { "include": "#expression" },
+        { "include": "#punctuation" }
+      ]
+    },
+
+    "expression": {
+      "comment": "Expressions: numbers, references, operators, nested groups",
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#hex-color" },
+        { "include": "#numbers" },
+        { "include": "#operators" },
+        { "include": "#group" },
+        {
+          "comment": "Variable/parameter reference in an expression",
+          "name": "variable.other.minilogo",
+          "match": "\\b[_a-zA-Z]\\w*\\b"
+        }
+      ]
+    },
+
+    "group": {
+      "comment": "Parenthesized sub-expression",
+      "begin": "\\(",
+      "beginCaptures": {
+        "0": { "name": "punctuation.parenthesis.open.minilogo" }
+      },
+      "end": "\\)",
+      "endCaptures": {
+        "0": { "name": "punctuation.parenthesis.close.minilogo" }
+      },
+      "patterns": [
+        { "include": "#expression" },
+        { "include": "#punctuation" }
+      ]
+    },
+
+    "hex-color": {
+      "name": "constant.other.color.hex.minilogo",
+      "match": "#[0-9a-fA-F]{3,6}\\b"
+    },
+
+    "numbers": {
+      "patterns": [
+        {
+          "comment": "Decimal number: .5 or 3.14 or -2.7",
+          "name": "constant.numeric.decimal.minilogo",
+          "match": "-?(?:[0-9]+)?\\.[0-9]+"
+        },
+        {
+          "comment": "Integer: 42 or -7",
+          "name": "constant.numeric.integer.minilogo",
+          "match": "-?[0-9]+"
+        }
+      ]
+    },
+
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.arithmetic.minilogo",
+          "match": "[+\\-*/]"
+        },
+        {
+          "name": "keyword.operator.assignment.minilogo",
+          "match": "="
+        }
+      ]
+    },
+
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.separator.comma.minilogo",
+          "match": ","
+        },
+        {
+          "name": "punctuation.parenthesis.open.minilogo",
+          "match": "\\("
+        },
+        {
+          "name": "punctuation.parenthesis.close.minilogo",
+          "match": "\\)"
+        },
+        {
+          "name": "punctuation.brace.open.minilogo",
+          "match": "\\{"
+        },
+        {
+          "name": "punctuation.brace.close.minilogo",
+          "match": "\\}"
+        }
+      ]
+    }
+  }
+}

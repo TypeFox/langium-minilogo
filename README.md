@@ -23,7 +23,7 @@ There are several example programs in the 'examples' folder you can check out, s
 - **Macros** are definable, taking arguments upon calling that are bound to parameters which can be referenced in a macro's body
 - **Color** can be set for the lines that are drawn, affecting all subsequent 'move' comands.
 
-Notably, there is _no branching_ instruction present, as there are _no booleans_ present in this language.
+Notably, there is _no branching_ instruction present, as there are _no booleans_ present in this language. This is an explicit choice to keep the syntax and semantics simpler overall, particularly for demonstrational purposes.
 
 ## Building && Running Locally
 
@@ -46,19 +46,19 @@ If you just want to generate code from parsed MiniLogo programs, you can use the
 npm run generate:test
 ```
 
-You can also use the cli more directly to generate either an AST or commands in JSON, whichever is of more interest. The AST will allow you to process the program as data, and the commands are pre-processed to support a simple stack-based drawing machine (a version of which is implemented in this project for demonstration).
+You can also use the cli more directly to generate either a serialized AST or commands in JSON, whichever is of more interest. The AST will allow you to process the program as data, and the commands are pre-processed to support a simple stack-based drawing machine (a version of which is implemented in this project for demonstration).
 
 ```bash
 # generate an AST
 ./bin/minilogo.js generate examples/simple.logo > examples/ast.json
 
 # generate commands
-./bin/minilogo.js generate-cmds examples/simple.logo > examples/ast.json
+./bin/minilogo.js generate-cmds examples/simple.logo > examples/commands.json
 ```
 
 This will give you a a JSON array of drawing commands generated from the **examples/simple.logo** program. You can also run this on any other MiniLogo program that you'd like to test, such as **examples/test.logo** and **examples/turtle.logo**.
 
-This output can be fed into another program to process the corresponding drawing commands, without needing to interact with a Minilogo program directly.
+This output can be fed into another program to process the corresponding drawing commands, without needing to interact with a MiniLogo program directly.
 
 ## Building && Running the VSCode extension
 
@@ -87,7 +87,7 @@ npm run langium:generate
 npm run build:web
 ```
 
-This builds Minilogo, and sets up the libraries that you will need in **public** for all MiniLogo programs. You can startup an simple express app on localhost:3000 with a default program by running the following.
+This builds MiniLogo, and sets up the libraries that you will need in **public** for all MiniLogo programs. We currently include `vite` as a dev dependency to both build & serve this web example:
 
 ```bash
 npm run serve
@@ -99,20 +99,22 @@ If you're running after making a large quantity of changes, you can always run `
 
 There are some example MiniLogo programs in the **examples** folder that you can try out as well.
 
-At a high-level, updating the canvas works by:
+At a high-level, updating the canvas works through the following steps:
 
-- Monaco is started with a language client (LC), and is connected to an Minilogo language server (LS)
+- Monaco is started with a language client (LC), and is connected to an MiniLogo language server (LS)
 - The document is updated, and the LC passes this new document (program) to the LS
 - the language server (Langium) receives the document
 - the document is parsed & an AST is produced, validations are performed, etc.
 - the generator is invoked to traverse and transform this AST into an array of drawing commands (includes evaluation of exprs)
-- these resulting commands, along with the AST, are returned as the result as a response to a successfully validated (processed) document
-- the front-end receives & processes these drawing instructions using a very simple stack-based machine
+- these resulting commands, along with the AST, are returned as the response to a successfully validated (processed) document
+- the front-end receives & processes these drawing instructions using a simple stack-based machine
 - the machine drives visual updates to the canvas
 
-This is a hyper generalization of each step, but should be sufficient to get a good idea of how this example implementation works.
+This is a hyper generalization of each step, but it should be sufficient to get a good idea of how this example implementation works overall.
 
-Here are the results of a couple of example programs
+Here are the results of a couple of example programs:
+
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/starry.png" width=500 alt="Crude Representation of Van Gogh's Starry Night in MiniLogo">
 
 <img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
 
