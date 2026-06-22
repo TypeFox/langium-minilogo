@@ -1,5 +1,8 @@
 # MiniLogo in Langium
 
+[![CI](https://github.com/langium/langium-minilogo/actions/workflows/ci.yml/badge.svg)](https://github.com/langium/langium-minilogo/actions/workflows/ci.yml)
+[![npm](https://img.shields.io/npm/v/langium-minilogo)](https://www.npmjs.com/package/langium-minilogo)
+
 An example of implementing a simple DSL, MiniLogo, in Langium.
 
 The core artifacts of this project are:
