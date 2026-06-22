@@ -80,6 +80,7 @@
         "langium:generate": "langium generate",
         "langium:watch": "langium generate --watch",
         "generate:test": "./bin/minilogo.js generate ./examples/simple.logo",
+        "test": "vitest run",
         "generate:logo": "./bin/minilogo.js generate ./examples/langium.logo"
     },
     "dependencies": {
@@ -100,7 +101,8 @@
         "monaco-languageclient": "~10.7.0",
         "oxlint": "1.70.0",
         "typescript": "~6.0.3",
-        "vite": "^8.0.16"
+        "vite": "^8.0.16",
+        "vitest": "^4.1.9"
     },
     "repository": {
         "type": "git",
