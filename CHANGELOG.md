@@ -1,5 +1,12 @@
 # CHANGELOG
 
+# 4.0.1
+
+- Fix up the hosted web example using native node (there will still be an MLC example too)
+- Generated a starry night logo program + example image
+- Moved some misplaced dev deps
+- Small README refresh
+
 # 4.0.0
 
 - **Breaking:** Migrated web editor from `monaco-editor-wrapper` to `monaco-languageclient` (Extended Mode)
