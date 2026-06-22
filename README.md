@@ -119,6 +119,6 @@ Here are the results of a couple of example programs:
 
 <img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/starry.png" width=500 alt="Crude Representation of Van Gogh's Starry Night in MiniLogo">
 
-<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
-
 <img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m3.gif" width=500 alt="Image of a turtle being drawn with MiniLogo via Langium">
+
+<img src="https://raw.githubusercontent.com/langium/langium-minilogo/main/images/m1.jpg" width=500 alt="Image of the resulting HTML page generated test.logo">
