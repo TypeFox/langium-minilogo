@@ -1,10 +1,7 @@
 {
     "$schema": "https://unpkg.com/knip@6/schema.json",
     "entry": [
-        "src/cli/main.ts",
-        "src/web/main.ts",
-        "src/web/app.ts",
-        "src/language-server/main-browser.ts"
+        "src/web/app.ts"
     ],
     "project": ["src/**/*.ts"],
     "ignore": [
