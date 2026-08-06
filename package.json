@@ -1,6 +1,6 @@
 {
     "name": "langium-minilogo",
-    "version": "4.0.1",
+    "version": "4.2.0",
     "displayName": "MiniLogo",
     "icon": "icon.png",
     "type": "module",
