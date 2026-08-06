@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 4.2.1
+- Patch, adds missing import code for `/module`
+
 ## 4.2.0
 - Added `module` export to import and leverage language services individually
 - Added types
