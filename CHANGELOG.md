@@ -1,13 +1,17 @@
 # CHANGELOG
 
-# 4.0.1
+## 4.2.0
+- Added `module` export to import and leverage language services individually
+- Added types
+
+## 4.0.1
 
 - Fix up the hosted web example using native node (there will still be an MLC example too)
 - Generated a starry night logo program + example image
 - Moved some misplaced dev deps
 - Small README refresh
 
-# 4.0.0
+## 4.0.0
 
 - **Breaking:** Migrated web editor from `monaco-editor-wrapper` to `monaco-languageclient` (Extended Mode)
 - **Breaking:** Updated to Langium 4.3.0 (from 3.x)
@@ -24,7 +28,7 @@
 - **Known issues**
 - Self hosted web example not working, going to drop and move in favor of hosting in the monaco-languageclient directly
 
-# 2.0.0
+## 2.0.0
 
 - Moved to ESM
 - Updated to TypeScript 5.2.2
@@ -36,12 +40,12 @@
 - Changed the package.json to use explicit exports, for ESM compatibility
 - renamed cli.js to minilogo.js
 
-# 1.2.0
+## 1.2.0
 
 - Bumped to Langium version 1.2.0
 - Updated associated packages to support usage of the new [langium-minilogo npm package](https://www.npmjs.com/package/langium-minilogo)
 - Setup a document listener in the language server, allowing the client to register for & receive Minilogo commands from validated documents
 
-# 1.0.0
+## 1.0.0
 
 - Initial release

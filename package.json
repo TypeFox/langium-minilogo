@@ -59,7 +59,8 @@
         ".": "./out/extension.cjs",
         "./ls-web": "./out/language-server/main-browser-min.js",
         "./cli": "./out/cli/main.js",
-        "./web": "./out/web/main.js"
+        "./web": "./out/web/main.js",
+        "./module": "./out/language-server/minilogo-module.js"
     },
     "main": "./out/extension.cjs",
     "scripts": {
