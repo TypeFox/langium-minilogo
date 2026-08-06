@@ -1,6 +1,6 @@
 {
     "name": "langium-minilogo",
-    "version": "4.2.0",
+    "version": "4.2.1",
     "displayName": "MiniLogo",
     "icon": "icon.png",
     "type": "module",
@@ -47,6 +47,8 @@
     "files": [
         "bin",
         "out/language-server/main-browser-min.js",
+        "out/language-server/minilogo*",
+        "out/language-server/generated",
         "out/cli",
         "out/extension",
         "out/web",
