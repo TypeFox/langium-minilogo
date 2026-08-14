@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 4.2.2
+- Patch, remove extra *.map files from package
+
 ## 4.2.1
 - Patch, adds missing import code for `/module`
 

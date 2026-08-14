@@ -1,6 +1,6 @@
 {
     "name": "langium-minilogo",
-    "version": "4.2.1",
+    "version": "4.2.2",
     "displayName": "MiniLogo",
     "icon": "icon.png",
     "type": "module",
@@ -50,6 +50,7 @@
         "out/language-server/minilogo*",
         "out/language-server/generated",
         "out/cli",
+        "!out/**/*.map",
         "out/extension",
         "out/web",
         "syntaxes"
